@@ -23,18 +23,22 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/instructor" element={<Instructor />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/parent" element={<Parent />} />
-            <Route path="/discussions" element={<Discussions />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <AuthProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<>Login</>} />
+              <Route path="/register" element={<>Register</>} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/instructor" element={<Instructor />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/parent" element={<Parent />} />
+              <Route path="/discussions" element={<Discussions />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
