@@ -42,5 +42,9 @@ export function createServer() {
   app.post("/api/ai/chat", ai.handleChat);
   app.get("/api/ai/history", ai.handleGetHistory);
 
+  // error handler
+  const err = require("./middleware/error").errorHandler;
+  app.use(err);
+
   return app;
 }
