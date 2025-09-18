@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import Parent from "./pages/Parent";
 import Discussions from "./pages/Discussions";
 import { Layout } from "./components/app/Layout";
+import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
 
