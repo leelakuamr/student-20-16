@@ -10,3 +10,32 @@
 export interface DemoResponse {
   message: string;
 }
+
+export interface UserMe {
+  id: string;
+  name: string;
+  role?: "student" | "instructor" | "admin" | "parent";
+}
+
+export interface ProgressEntry {
+  course: string;
+  value: number;
+}
+
+export interface RecommendationsResponse {
+  items: { id: string; title: string; reason: string }[];
+}
+
+export interface DiscussionsPost {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface AssignSubmission {
+  id: string;
+  filename: string;
+  submittedAt: string;
+  status: string;
+}
