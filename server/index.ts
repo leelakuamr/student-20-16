@@ -4,6 +4,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import * as edu from "./routes/education";
 import * as auth from "./routes/auth";
+import * as ai from "./routes/ai";
 
 export function createServer() {
   const app = express();
