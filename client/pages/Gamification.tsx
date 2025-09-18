@@ -2,12 +2,20 @@ import { Leaderboard } from "@/components/app/Leaderboard";
 import { useEffect, useState } from "react";
 
 export default function Gamification() {
-  const [badges, setBadges] = useState(() => JSON.parse(localStorage.getItem('badges') || '[]'));
-  useEffect(() => { localStorage.setItem('badges', JSON.stringify(badges)); }, [badges]);
+  const [badges, setBadges] = useState<any[]>([]);
+  useEffect(() => { (async ()=>{ const r = await fetch('/api/badges'); if (r.ok) setBadges((await r.json()).badges || []); })(); }, []);
 
-  function award() {
-    const id = `b_${Date.now()}`;
-    setBadges((b:any) => [{ id, title: 'Consistency Champ', awardedAt: Date.now() }, ...b]);
+  async function award() {
+    // award to current user if logged in
+    const token = localStorage.getItem('token');
+    const userRes = token ? await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } }) : null;
+    const user = userRes && userRes.ok ? await userRes.json() : null;
+    const payload = { userId: user?.id ?? '', title: 'Consistency Champ' };
+    const r = await fetch('/api/badges', { method: 'POST', headers: { 'Content-Type': 'application/json' , ...(token?{Authorization:`Bearer ${token}`}: {})}, body: JSON.stringify(payload) });
+    if (r.ok) {
+      const j = await r.json();
+      setBadges((b) => [j.badge, ...b]);
+    }
   }
 
   return (
