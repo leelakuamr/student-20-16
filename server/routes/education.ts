@@ -33,7 +33,7 @@ export const handleDiscussions: RequestHandler = (req, res) => {
   if (req.method === "GET") return res.json({ posts: discussions });
   if (req.method === "POST") {
     const { content } = req.body as { content: string };
-    const post = { id: uuidv4(), author: "You", content, createdAt: new Date().toISOString() };
+    const post = { id: genId('post'), author: "You", content, createdAt: new Date().toISOString() };
     discussions.unshift(post);
     return res.status(201).json({ post });
   }
