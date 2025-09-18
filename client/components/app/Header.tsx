@@ -92,6 +92,40 @@ export function Header() {
   );
 }
 
+function AccessibilityControls() {
+  const [large, setLarge] = useState(() => localStorage.getItem('a11y-large') === '1');
+  const [highContrast, setHighContrast] = useState(() => localStorage.getItem('a11y-contrast') === '1');
+
+  useEffect(() => {
+    const el = document.documentElement;
+    if (large) el.classList.add('a11y-large'); else el.classList.remove('a11y-large');
+    if (highContrast) el.classList.add('a11y-contrast'); else el.classList.remove('a11y-contrast');
+    localStorage.setItem('a11y-large', large ? '1' : '0');
+    localStorage.setItem('a11y-contrast', highContrast ? '1' : '0');
+  }, [large, highContrast]);
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        aria-pressed={large}
+        onClick={() => setLarge((s) => !s)}
+        className="rounded-md border px-2 py-1 text-sm"
+        title="Toggle larger text"
+      >
+        A+
+      </button>
+      <button
+        aria-pressed={highContrast}
+        onClick={() => setHighContrast((s) => !s)}
+        className="rounded-md border px-2 py-1 text-sm"
+        title="Toggle high contrast"
+      >
+        HC
+      </button>
+    </div>
+  );
+}
+
 function AuthControls() {
   const { user, logout } = useAuth();
   if (!user) {
