@@ -46,6 +46,39 @@ export function Header() {
           >
             Discussions
           </NavLink>
+          <NavLink
+            to="/study-groups"
+            className={({ isActive }) =>
+              cn(
+                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+              )
+            }
+          >
+            Study Groups
+          </NavLink>
+          <NavLink
+            to="/gamification"
+            className={({ isActive }) =>
+              cn(
+                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+              )
+            }
+          >
+            Gamification
+          </NavLink>
+          <NavLink
+            to="/calendar"
+            className={({ isActive }) =>
+              cn(
+                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+              )
+            }
+          >
+            Calendar
+          </NavLink>
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
