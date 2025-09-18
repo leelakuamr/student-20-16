@@ -1,5 +1,8 @@
 import { RequestHandler } from "express";
-import { v4 as uuidv4 } from "uuid";
+
+function genId(prefix = "id") {
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
 
 // In-memory demo data (replace with DB integrations)
 const users = [{ id: "u1", name: "Student" }];
