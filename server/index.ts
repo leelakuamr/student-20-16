@@ -29,7 +29,6 @@ export function createServer() {
   app.all("/api/assignments", edu.handleAssignments);
 
   // Auth
-  const auth = await import("./routes/auth");
   app.post("/api/auth/register", auth.handleRegister);
   app.post("/api/auth/login", auth.handleLogin);
   app.post("/api/auth/logout", auth.handleLogout);
