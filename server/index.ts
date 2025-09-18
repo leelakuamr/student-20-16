@@ -6,6 +6,7 @@ import { handleDemo } from "./routes/demo";
 import * as edu from "./routes/education";
 import * as auth from "./routes/auth";
 import * as ai from "./routes/ai";
+import * as gm from "./routes/gamification";
 
 export function createServer() {
   const app = express();
