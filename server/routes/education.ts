@@ -44,7 +44,7 @@ export const handleAssignments: RequestHandler = (req, res) => {
   if (req.method === "GET") return res.json({ submissions });
   if (req.method === "POST") {
     const { filename } = req.body as { filename: string };
-    const s = { id: uuidv4(), filename, submittedAt: new Date().toISOString(), status: "submitted" };
+    const s = { id: genId('sub'), filename, submittedAt: new Date().toISOString(), status: "submitted" };
     submissions.unshift(s);
     return res.status(201).json({ submission: s });
   }
