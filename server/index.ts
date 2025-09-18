@@ -44,7 +44,6 @@ export function createServer() {
   app.get("/api/ai/history", ai.handleGetHistory);
 
   // Gamification / Groups / Calendar
-  const gm = await import('./routes/gamification');
   app.get('/api/groups', gm.getGroups);
   app.post('/api/groups', gm.createGroup);
   app.post('/api/groups/:id/join', gm.joinGroup);
