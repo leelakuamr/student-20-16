@@ -13,10 +13,28 @@ export function ChatBot() {
 
   useEffect(() => {
     if (!open) return;
-    // greet
-    if (messages.length === 0) {
-      setMessages([{ id: "m1", from: "bot", text: "Hi! I'm AdeptBot. Ask me about courses, assignments, or personalized learning tips." }]);
-    }
+    (async () => {
+      // load history if available
+      if (token) {
+        try {
+          const res = await fetch('/api/ai/history', { headers: { Authorization: `Bearer ${token}` } });
+          if (res.ok) {
+            const j = await res.json();
+            const items: Msg[] = (j.items || []).map((it: any, idx: number) => ({ id: `h_${idx}_${it.time || Date.now()}`, from: it.role === 'user' ? 'user' : 'bot', text: it.content }));
+            if (items.length) {
+              setMessages(items);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('history load error', e);
+        }
+      }
+      // greet if no history
+      if (messages.length === 0) {
+        setMessages([{ id: "m1", from: "bot", text: "Hi! I'm AdeptBot. Ask me about courses, assignments, or personalized learning tips." }]);
+      }
+    })();
   }, [open]);
 
   useEffect(() => {
