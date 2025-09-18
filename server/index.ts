@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import * as edu from "./routes/education";
 
 export function createServer() {
   const app = express();
@@ -20,7 +21,6 @@ export function createServer() {
   app.get("/api/demo", handleDemo);
 
   // Education APIs
-  const edu = await import("./routes/education");
   app.get("/api/users/me", edu.handleGetUser);
   app.get("/api/progress", edu.handleGetProgress);
   app.get("/api/recommendations", edu.handleGetRecommendations);
