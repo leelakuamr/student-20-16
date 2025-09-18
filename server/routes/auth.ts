@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import crypto from "crypto";
-import { readJSON, writeJSON } from "@/utils/db";
+import { readJSON, writeJSON } from "../utils/db";
 
 type User = {
   id: string;
