@@ -7,23 +7,38 @@ function genId() {
 }
 
 export default function StudyGroups() {
-  const [groups, setGroups] = useState<Group[]>(() => JSON.parse(localStorage.getItem('study_groups') || '[]'));
+  const [groups, setGroups] = useState<Group[]>([]);
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('study_groups', JSON.stringify(groups));
-  }, [groups]);
+    (async () => {
+      const res = await fetch('/api/groups');
+      if (res.ok) {
+        const j = await res.json();
+        setGroups(j.groups || []);
+      }
+    })();
+  }, []);
 
-  function create() {
+  async function create() {
     if (!name.trim()) return;
-    setGroups((g) => [{ id: genId(), name: name.trim(), description: desc.trim(), members: [] }, ...g]);
-    setName(''); setDesc('');
+    const res = await fetch('/api/groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, description: desc }) });
+    if (res.ok) {
+      const j = await res.json();
+      setGroups((g) => [j.group, ...g]);
+      setName(''); setDesc('');
+    }
   }
 
-  function join(id: string) {
-    const user = localStorage.getItem('demo_user') || 'You';
-    setGroups((prev) => prev.map((gr) => (gr.id === id ? { ...gr, members: Array.from(new Set([...gr.members, user])) } : gr)));
+  async function join(id: string) {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`/api/groups/${id}/join`, { method: 'POST', headers: { Authorization: token ? `Bearer ${token}` : '' } });
+    if (res.ok) {
+      // refresh
+      const r2 = await fetch('/api/groups');
+      if (r2.ok) setGroups((await r2.json()).groups || []);
+    }
   }
 
   return (
