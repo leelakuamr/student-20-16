@@ -46,12 +46,34 @@ export function Header() {
             Discussions
           </NavLink>
         </nav>
-        <div className="flex items-center gap-2">
-          <Button asChild variant="secondary">
-            <Link to={location.pathname === "/dashboard" ? "/dashboard" : "/dashboard"}>Get Started</Link>
-          </Button>
+        <div className="flex items-center gap-3">
+          <div className="hidden items-center gap-3 md:flex">
+            <span className="text-sm text-muted-foreground">{/* placeholder for role */}</span>
+          </div>
+          <AuthControls />
         </div>
       </div>
     </header>
+  );
+}
+
+function AuthControls() {
+  // lazy load to avoid cycles
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { useAuth } = require("@/hooks/useAuth");
+  const { user, logout } = useAuth();
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link to="/login" className="text-sm text-foreground/80 hover:underline">Sign In</Link>
+        <Link to="/register" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground">Sign Up</Link>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-sm font-medium">{user.name}</span>
+      <button onClick={() => logout()} className="text-sm text-muted-foreground hover:text-foreground">Logout</button>
+    </div>
   );
 }
