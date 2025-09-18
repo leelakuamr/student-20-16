@@ -8,6 +8,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Dashboard from "./pages/Dashboard";
+import Instructor from "./pages/Instructor";
+import Admin from "./pages/Admin";
+import Parent from "./pages/Parent";
+import Discussions from "./pages/Discussions";
+import { Layout } from "./components/app/Layout";
 
 const queryClient = new QueryClient();
 
@@ -17,11 +23,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/instructor" element={<Instructor />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/parent" element={<Parent />} />
+            <Route path="/discussions" element={<Discussions />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
