@@ -37,6 +37,7 @@ export function createServer() {
 
   // AI
   app.post("/api/ai/chat", ai.handleChat);
+  app.get("/api/ai/history", ai.handleGetHistory);
 
   return app;
 }
