@@ -59,9 +59,6 @@ export function Header() {
 }
 
 function AuthControls() {
-  // lazy load to avoid cycles
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { useAuth } = require("@/hooks/useAuth");
   const { user, logout } = useAuth();
   if (!user) {
     return (
