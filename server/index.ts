@@ -14,6 +14,8 @@ export function createServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  // serve uploaded files
+  app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
