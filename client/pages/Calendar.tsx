@@ -6,11 +6,17 @@ function toICSEvent(title: string, dt: Date) {
 }
 
 export default function CalendarPage() {
-  const events = [
-    { title: 'Algebra Quiz', date: new Date(Date.now() + 86400000 * 2) },
-    { title: 'Essay Draft Due', date: new Date(Date.now() + 86400000 * 5) },
-    { title: 'Group Project Sync', date: new Date(Date.now() + 86400000 * 7) },
-  ];
+  const [events, setEvents] = React.useState(() => [] as { title: string; date: Date }[]);
+
+  React.useEffect(() => {
+    (async () => {
+      const r = await fetch('/api/events');
+      if (r.ok) {
+        const j = await r.json();
+        setEvents((j.events || []).map((e:any)=>({ title: e.title, date: new Date(e.startsAt) })));
+      }
+    })();
+  }, []);
 
   function exportICS() {
     let ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AdeptLearn//EN\n';
