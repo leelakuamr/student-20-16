@@ -48,7 +48,7 @@ export default function Dashboard() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Interactive Module</h2>
             <VideoPlayer
-              src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+              src="https://www.youtube.com/watch?v=ysz5S6PUM-U"
               title="Introduction to Quadratic Equations"
             />
           </div>
