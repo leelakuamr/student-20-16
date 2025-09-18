@@ -13,6 +13,8 @@ import Instructor from "./pages/Instructor";
 import Admin from "./pages/Admin";
 import Parent from "./pages/Parent";
 import Discussions from "./pages/Discussions";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
 
