@@ -42,6 +42,16 @@ export function createServer() {
   app.post("/api/ai/chat", ai.handleChat);
   app.get("/api/ai/history", ai.handleGetHistory);
 
+  // Gamification / Groups / Calendar
+  const gm = await import('./routes/gamification');
+  app.get('/api/groups', gm.getGroups);
+  app.post('/api/groups', gm.createGroup);
+  app.post('/api/groups/:id/join', gm.joinGroup);
+  app.get('/api/badges', gm.getBadges);
+  app.post('/api/badges', gm.awardBadge);
+  app.get('/api/events', gm.getEvents);
+  app.post('/api/events', gm.createEvent);
+
   // error handler
   const err = require("./middleware/error").errorHandler;
   app.use(err);
