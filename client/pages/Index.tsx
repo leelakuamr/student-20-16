@@ -87,6 +87,22 @@ export default function Index() {
               title: "Discussion forums",
               desc: "Peer-to-peer help and moderated Q&A.",
             },
+            {
+              title: "Gamification",
+              desc: "Badges, leaderboards, and streaks to motivate learners.",
+            },
+            {
+              title: "Study Groups",
+              desc: "Collaborate with peers, create or join study groups.",
+            },
+            {
+              title: "Calendar",
+              desc: "Keep track of assignments, quizzes, and events with exportable calendars.",
+            },
+            {
+              title: "Accessibility",
+              desc: "High contrast, larger text, and keyboard-first navigation.",
+            },
           ].map((f) => (
             <div key={f.title} className="rounded-xl border p-6">
               <h3 className="font-semibold">{f.title}</h3>
