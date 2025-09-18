@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { readJSON } from "@/utils/db";
+import { readJSON } from "../utils/db";
 
 export function requireAuth(role?: string): RequestHandler {
   return async (req, res, next) => {
