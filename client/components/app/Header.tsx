@@ -19,7 +19,9 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-secondary" />
-          <span className="text-lg font-extrabold tracking-tight">AdeptLearn</span>
+          <span className="text-lg font-extrabold tracking-tight">
+            AdeptLearn
+          </span>
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
@@ -29,7 +31,8 @@ export function Header() {
               className={({ isActive }) =>
                 cn(
                   "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                  isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                  isActive &&
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
                 )
               }
             >
@@ -41,7 +44,8 @@ export function Header() {
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                isActive &&
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
               )
             }
           >
@@ -52,7 +56,8 @@ export function Header() {
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                isActive &&
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
               )
             }
           >
@@ -63,7 +68,8 @@ export function Header() {
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                isActive &&
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
               )
             }
           >
@@ -74,7 +80,8 @@ export function Header() {
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
+                isActive &&
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
               )
             }
           >
@@ -83,7 +90,9 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
-            <span className="text-sm text-muted-foreground">{/* placeholder for role */}</span>
+            <span className="text-sm text-muted-foreground">
+              {/* placeholder for role */}
+            </span>
           </div>
           <AuthControls />
         </div>
@@ -93,15 +102,21 @@ export function Header() {
 }
 
 function AccessibilityControls() {
-  const [large, setLarge] = useState(() => localStorage.getItem('a11y-large') === '1');
-  const [highContrast, setHighContrast] = useState(() => localStorage.getItem('a11y-contrast') === '1');
+  const [large, setLarge] = useState(
+    () => localStorage.getItem("a11y-large") === "1",
+  );
+  const [highContrast, setHighContrast] = useState(
+    () => localStorage.getItem("a11y-contrast") === "1",
+  );
 
   useEffect(() => {
     const el = document.documentElement;
-    if (large) el.classList.add('a11y-large'); else el.classList.remove('a11y-large');
-    if (highContrast) el.classList.add('a11y-contrast'); else el.classList.remove('a11y-contrast');
-    localStorage.setItem('a11y-large', large ? '1' : '0');
-    localStorage.setItem('a11y-contrast', highContrast ? '1' : '0');
+    if (large) el.classList.add("a11y-large");
+    else el.classList.remove("a11y-large");
+    if (highContrast) el.classList.add("a11y-contrast");
+    else el.classList.remove("a11y-contrast");
+    localStorage.setItem("a11y-large", large ? "1" : "0");
+    localStorage.setItem("a11y-contrast", highContrast ? "1" : "0");
   }, [large, highContrast]);
 
   return (
@@ -131,15 +146,30 @@ function AuthControls() {
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <Link to="/login" className="text-sm text-foreground/80 hover:underline">Sign In</Link>
-        <Link to="/register" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground">Sign Up</Link>
+        <Link
+          to="/login"
+          className="text-sm text-foreground/80 hover:underline"
+        >
+          Sign In
+        </Link>
+        <Link
+          to="/register"
+          className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
+        >
+          Sign Up
+        </Link>
       </div>
     );
   }
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm font-medium">{user.name}</span>
-      <button onClick={() => logout()} className="text-sm text-muted-foreground hover:text-foreground">Logout</button>
+      <button
+        onClick={() => logout()}
+        className="text-sm text-muted-foreground hover:text-foreground"
+      >
+        Logout
+      </button>
     </div>
   );
 }

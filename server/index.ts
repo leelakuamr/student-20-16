@@ -16,7 +16,7 @@ export function createServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   // serve uploaded files
-  app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+  app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
@@ -44,13 +44,13 @@ export function createServer() {
   app.get("/api/ai/history", ai.handleGetHistory);
 
   // Gamification / Groups / Calendar
-  app.get('/api/groups', gm.getGroups);
-  app.post('/api/groups', gm.createGroup);
-  app.post('/api/groups/:id/join', gm.joinGroup);
-  app.get('/api/badges', gm.getBadges);
-  app.post('/api/badges', gm.awardBadge);
-  app.get('/api/events', gm.getEvents);
-  app.post('/api/events', gm.createEvent);
+  app.get("/api/groups", gm.getGroups);
+  app.post("/api/groups", gm.createGroup);
+  app.post("/api/groups/:id/join", gm.joinGroup);
+  app.get("/api/badges", gm.getBadges);
+  app.post("/api/badges", gm.awardBadge);
+  app.get("/api/events", gm.getEvents);
+  app.post("/api/events", gm.createEvent);
 
   // error handler
   const err = require("./middleware/error").errorHandler;
