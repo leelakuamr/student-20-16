@@ -4,14 +4,8 @@ function genId(prefix = "id") {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-// In-memory demo data (replace with DB integrations)
-const users = [{ id: "u1", name: "Student" }];
-const progress = [
-  { course: "Algebra I", value: 72 },
-  { course: "Chemistry", value: 64 },
-];
-const discussions = [{ id: "d1", author: "Rohan", content: "How do I solve eqn #3?", createdAt: new Date().toISOString() }];
-const submissions = [];
+// Persistent JSON storage via utils
+import { readJSON, writeJSON } from "@/utils/db";
 
 export const handleGetUser: RequestHandler = (req, res) => {
   res.json(users[0]);
