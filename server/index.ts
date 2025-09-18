@@ -36,7 +36,6 @@ export function createServer() {
   app.get("/api/auth.me", auth.handleMe);
 
   // AI
-  const ai = await import("./routes/ai");
   app.post("/api/ai/chat", ai.handleChat);
 
   return app;
