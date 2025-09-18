@@ -5,7 +5,7 @@ function genId(prefix = "id") {
 }
 
 // Persistent JSON storage via utils
-import { readJSON, writeJSON } from "@/utils/db";
+import { readJSON, writeJSON } from "../utils/db";
 
 export const handleGetUser: RequestHandler = async (req, res) => {
   const users = await readJSON("users.json", [{ id: "u1", name: "Student" }]);
