@@ -19,5 +19,13 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Education APIs
+  const edu = await import("./routes/education");
+  app.get("/api/users/me", edu.handleGetUser);
+  app.get("/api/progress", edu.handleGetProgress);
+  app.get("/api/recommendations", edu.handleGetRecommendations);
+  app.all("/api/discussions", edu.handleDiscussions);
+  app.all("/api/assignments", edu.handleAssignments);
+
   return app;
 }
