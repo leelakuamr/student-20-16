@@ -54,7 +54,6 @@ export function createServer() {
   app.post("/api/events", gm.createEvent);
 
   // User management
-  const usersRoutes = await import('./routes/users');
   app.delete('/api/users/me', usersRoutes.deleteMe);
   app.delete('/api/users/:id', usersRoutes.deleteUserById);
   app.get('/api/users', usersRoutes.listUsers);
