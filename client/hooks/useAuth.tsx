@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getAuth, getFirestore } from "@/lib/firebase";
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 
 type User = { id: string; name: string; role?: string } | null;
 
@@ -21,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const auth = getAuth();
+    const db = getFirestore();
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
         setUser(null);
@@ -29,7 +30,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
-      setUser({ id: fbUser.uid, name: fbUser.displayName || fbUser.email || "" });
+      let role: string | undefined = undefined;
+      try {
+        const snap = await getDoc(doc(db, "users", fbUser.uid));
+        role = (snap.exists() ? (snap.data() as any).role : undefined) ?? undefined;
+      } catch {}
+      setUser({ id: fbUser.uid, name: fbUser.displayName || fbUser.email || "", role });
     });
     return () => unsub();
   }, []);
