@@ -22,7 +22,9 @@ export default function Gamification() {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const ures = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
+          const ures = await fetch("/api/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           if (ures.ok) setUser(await ures.json());
         } catch (e) {
           console.error(e);
@@ -66,20 +68,26 @@ export default function Gamification() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold">Gamification</h1>
-      <p className="text-muted-foreground mt-1">Earn badges and climb the leaderboard.</p>
+      <p className="text-muted-foreground mt-1">
+        Earn badges and climb the leaderboard.
+      </p>
 
       <div className="mt-6 grid gap-6 md:grid-cols-3">
         <div className="rounded-lg border p-4">
           <h3 className="font-semibold">Your badges</h3>
           <ul className="mt-3 space-y-2">
-            {badges.length === 0 && <li className="text-sm text-muted-foreground">No badges yet</li>}
+            {badges.length === 0 && (
+              <li className="text-sm text-muted-foreground">No badges yet</li>
+            )}
             {badges.map((b: any) => (
               <li key={b.id} className="flex items-center gap-3">
                 <div className="rounded-full bg-accent/20 px-2 py-1">🏅</div>
                 <div>
                   <div className="font-medium">{b.title}</div>
                   <div className="text-xs text-muted-foreground">
-                    {new Date(b.awardedAt ?? b.createdAt ?? b.createdAt).toLocaleString()}
+                    {new Date(
+                      b.awardedAt ?? b.createdAt ?? b.createdAt,
+                    ).toLocaleString()}
                   </div>
                 </div>
               </li>
@@ -87,11 +95,17 @@ export default function Gamification() {
           </ul>
           <div className="mt-4">
             {!user ? (
-              <Link to="/login" className="rounded-md bg-muted px-4 py-2 text-muted-foreground">
+              <Link
+                to="/login"
+                className="rounded-md bg-muted px-4 py-2 text-muted-foreground"
+              >
                 Sign in to earn badges
               </Link>
             ) : (
-              <button onClick={award} className="rounded-md bg-primary px-4 py-2 text-primary-foreground">
+              <button
+                onClick={award}
+                className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
+              >
                 Award sample badge
               </button>
             )}

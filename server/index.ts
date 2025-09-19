@@ -41,9 +41,9 @@ export function createServer() {
   app.all("/api/assignments", edu.handleAssignments);
 
   // Chat
-  app.get('/api/chat', chatRoutes.getMessages);
-  app.post('/api/chat', chatRoutes.postMessage);
-  app.get('/api/chat/stream', chatRoutes.streamMessages);
+  app.get("/api/chat", chatRoutes.getMessages);
+  app.post("/api/chat", chatRoutes.postMessage);
+  app.get("/api/chat/stream", chatRoutes.streamMessages);
 
   // Auth
   app.post("/api/auth/register", auth.handleRegister);
@@ -65,16 +65,16 @@ export function createServer() {
   app.post("/api/events", gm.createEvent);
 
   // User management
-  app.delete('/api/users/me', usersRoutes.deleteMe);
-  app.delete('/api/users/:id', usersRoutes.deleteUserById);
-  app.get('/api/users', usersRoutes.listUsers);
-  app.put('/api/users/me', usersRoutes.updateMe);
+  app.delete("/api/users/me", usersRoutes.deleteMe);
+  app.delete("/api/users/:id", usersRoutes.deleteUserById);
+  app.get("/api/users", usersRoutes.listUsers);
+  app.put("/api/users/me", usersRoutes.updateMe);
 
   // Contact teachers
-  app.get('/api/teachers', contactRoutes.listTeachers);
-  app.post('/api/teachers', contactRoutes.createTeacher);
-  app.post('/api/contact-teacher', contactRoutes.sendMessageToTeacher);
-  app.get('/api/messages', contactRoutes.listMessages);
+  app.get("/api/teachers", contactRoutes.listTeachers);
+  app.post("/api/teachers", contactRoutes.createTeacher);
+  app.post("/api/contact-teacher", contactRoutes.sendMessageToTeacher);
+  app.get("/api/messages", contactRoutes.listMessages);
 
   // error handler
   const err = require("./middleware/error").errorHandler;

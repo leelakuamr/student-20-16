@@ -21,11 +21,21 @@ export const deleteMe: RequestHandler = async (req, res) => {
     // badges, submissions, group memberships, chat messages, progress, discussions
     await prisma.$transaction([
       prisma.badge.deleteMany({ where: { userId: user.id } }).catch(() => {}),
-      prisma.submission.deleteMany({ where: { userId: user.id } }).catch(() => {}),
-      prisma.groupMember.deleteMany({ where: { userId: user.id } }).catch(() => {}),
-      prisma.chatMessage.deleteMany({ where: { userId: user.id } }).catch(() => {}),
-      prisma.progressEntry.deleteMany({ where: { userId: user.id } }).catch(() => {}),
-      prisma.discussion.deleteMany({ where: { authorId: user.id } }).catch(() => {}),
+      prisma.submission
+        .deleteMany({ where: { userId: user.id } })
+        .catch(() => {}),
+      prisma.groupMember
+        .deleteMany({ where: { userId: user.id } })
+        .catch(() => {}),
+      prisma.chatMessage
+        .deleteMany({ where: { userId: user.id } })
+        .catch(() => {}),
+      prisma.progressEntry
+        .deleteMany({ where: { userId: user.id } })
+        .catch(() => {}),
+      prisma.discussion
+        .deleteMany({ where: { authorId: user.id } })
+        .catch(() => {}),
       prisma.user.deleteMany({ where: { id: user.id } }).catch(() => {}),
     ]);
   } catch (e) {
@@ -41,7 +51,8 @@ export const deleteUserById: RequestHandler = async (req, res) => {
   if (!auth) return res.status(401).json({ error: "Unauthorized" });
   const users = await readJSON("users.json", [] as any[]);
   const admin = users.find((u) => u.token === auth);
-  if (!admin || admin.role !== "admin") return res.status(403).json({ error: "Forbidden" });
+  if (!admin || admin.role !== "admin")
+    return res.status(403).json({ error: "Forbidden" });
 
   const { id } = req.params as { id: string };
 
@@ -55,7 +66,9 @@ export const deleteUserById: RequestHandler = async (req, res) => {
       prisma.submission.deleteMany({ where: { userId: id } }).catch(() => {}),
       prisma.groupMember.deleteMany({ where: { userId: id } }).catch(() => {}),
       prisma.chatMessage.deleteMany({ where: { userId: id } }).catch(() => {}),
-      prisma.progressEntry.deleteMany({ where: { userId: id } }).catch(() => {}),
+      prisma.progressEntry
+        .deleteMany({ where: { userId: id } })
+        .catch(() => {}),
       prisma.discussion.deleteMany({ where: { authorId: id } }).catch(() => {}),
       prisma.user.deleteMany({ where: { id } }).catch(() => {}),
     ]);
@@ -78,7 +91,11 @@ export const updateMe: RequestHandler = async (req, res) => {
   const idx = users.findIndex((u) => u.token === auth);
   if (idx === -1) return res.status(401).json({ error: "Unauthorized" });
 
-  const { name, email, password } = req.body as { name?: string; email?: string; password?: string };
+  const { name, email, password } = req.body as {
+    name?: string;
+    email?: string;
+    password?: string;
+  };
   if (email && users.find((u) => u.email === email && u.id !== users[idx].id)) {
     return res.status(409).json({ error: "Email exists" });
   }
@@ -88,11 +105,21 @@ export const updateMe: RequestHandler = async (req, res) => {
   if (password) {
     const crypto = await import("crypto");
     const salt = crypto.randomBytes(16).toString("hex");
-    const passwordHash = crypto.pbkdf2Sync(password, salt, 100_000, 64, "sha512").toString("hex");
+    const passwordHash = crypto
+      .pbkdf2Sync(password, salt, 100_000, 64, "sha512")
+      .toString("hex");
     users[idx].salt = salt;
     users[idx].passwordHash = passwordHash;
   }
 
   await writeJSON("users.json", users);
-  res.json({ ok: true, user: { id: users[idx].id, name: users[idx].name, email: users[idx].email, role: users[idx].role } });
+  res.json({
+    ok: true,
+    user: {
+      id: users[idx].id,
+      name: users[idx].name,
+      email: users[idx].email,
+      role: users[idx].role,
+    },
+  });
 };

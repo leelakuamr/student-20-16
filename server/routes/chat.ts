@@ -12,7 +12,12 @@ export const postMessage: RequestHandler = async (req, res) => {
   if (!text) return res.status(400).json({ error: "Missing text" });
 
   const messages = await readJSON("chat.json", [] as any[]);
-  const msg = { id: genId("m"), from: from ?? "Anonymous", text, createdAt: new Date().toISOString() };
+  const msg = {
+    id: genId("m"),
+    from: from ?? "Anonymous",
+    text,
+    createdAt: new Date().toISOString(),
+  };
   messages.unshift(msg);
   await writeJSON("chat.json", messages);
 
@@ -22,7 +27,9 @@ export const postMessage: RequestHandler = async (req, res) => {
     try {
       c.write(payload);
     } catch (e) {
-      try { c.end(); } catch {}
+      try {
+        c.end();
+      } catch {}
     }
   }
 

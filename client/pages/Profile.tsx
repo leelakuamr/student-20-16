@@ -12,9 +12,11 @@ export default function ProfilePage() {
   useEffect(() => {
     (async () => {
       const token = localStorage.getItem("token");
-      if (!token) return nav('/login');
-      const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) return nav('/login');
+      if (!token) return nav("/login");
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return nav("/login");
       const j = await res.json();
       setUser(j);
       setName(j.name);
@@ -23,27 +25,30 @@ export default function ProfilePage() {
   }, []);
 
   const save = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return nav('/login');
-    setStatus('Saving...');
+    const token = localStorage.getItem("token");
+    if (!token) return nav("/login");
+    setStatus("Saving...");
     try {
-      const res = await fetch('/api/users/me', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      const res = await fetch("/api/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ name, email, password: password || undefined }),
       });
       if (res.ok) {
         const j = await res.json();
-        setStatus('Saved');
+        setStatus("Saved");
         setUser(j.user);
-        setPassword('');
+        setPassword("");
       } else {
         const err = await res.json().catch(() => ({}));
-        setStatus(err?.error || 'Failed to save');
+        setStatus(err?.error || "Failed to save");
       }
     } catch (e) {
       console.error(e);
-      setStatus('Failed to save');
+      setStatus("Failed to save");
     }
     setTimeout(() => setStatus(null), 3000);
   };
@@ -57,17 +62,34 @@ export default function ProfilePage() {
 
       <div className="mt-6 card">
         <label className="block text-sm">Full name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-md border p-2" />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="mt-1 w-full rounded-md border p-2"
+        />
 
         <label className="block text-sm mt-3">Email</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full rounded-md border p-2" />
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="mt-1 w-full rounded-md border p-2"
+        />
 
         <label className="block text-sm mt-3">Change password</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full rounded-md border p-2" />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="mt-1 w-full rounded-md border p-2"
+        />
 
         <div className="mt-4 flex items-center gap-3">
-          <button onClick={save} className="btn-primary">Save</button>
-          {status && <span className="text-sm text-muted-foreground">{status}</span>}
+          <button onClick={save} className="btn-primary">
+            Save
+          </button>
+          {status && (
+            <span className="text-sm text-muted-foreground">{status}</span>
+          )}
         </div>
       </div>
     </section>
