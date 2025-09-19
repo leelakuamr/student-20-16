@@ -29,6 +29,8 @@ export const handleGetRecommendations: RequestHandler = async (req, res) => {
   res.json({ items });
 };
 
+const sseClients: import("http").ServerResponse[] = [];
+
 export const handleDiscussions: RequestHandler = async (req, res) => {
   if (req.method === "GET") {
     const discussions = await readJSON("discussions.json", [
@@ -42,9 +44,50 @@ export const handleDiscussions: RequestHandler = async (req, res) => {
     const post = { id: genId("post"), author: "You", content, createdAt: new Date().toISOString() };
     discussions.unshift(post);
     await writeJSON("discussions.json", discussions);
+
+    // broadcast to SSE clients
+    const payload = `data: ${JSON.stringify({ post })}\n\n`;
+    for (const client of sseClients.slice()) {
+      try {
+        client.write(payload);
+      } catch (e) {
+        // ignore broken client
+        try {
+          client.end();
+        } catch {}
+      }
+    }
+
     return res.status(201).json({ post });
   }
   res.status(405).end();
+};
+
+export const handleDiscussionStream: RequestHandler = async (req, res) => {
+  // SSE endpoint
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders?.();
+
+  // send a ping comment every 30s to keep connection alive
+  const ping = setInterval(() => {
+    try {
+      res.write(`: ping\n\n`);
+    } catch (e) {
+      clearInterval(ping);
+    }
+  }, 30_000);
+
+  // add to clients
+  sseClients.push(res as any);
+
+  // on close, remove
+  req.on("close", () => {
+    clearInterval(ping);
+    const idx = sseClients.indexOf(res as any);
+    if (idx >= 0) sseClients.splice(idx, 1);
+  });
 };
 
 export const handleAssignments: RequestHandler = async (req, res) => {
