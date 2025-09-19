@@ -30,9 +30,8 @@ export function ProtectedRoute({
 
   if (
     roles &&
-    user.role &&
-    !roles.includes(user.role) &&
-    user.role !== "admin"
+    user.role !== "admin" &&
+    (!user.role || !roles.includes(user.role))
   ) {
     return <Navigate to={homeFor(user.role)} replace />;
   }
