@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export default function Parent() {
   const [child] = useState({ name: "Anika", grade: "8" });
   const [progress, setProgress] = useState(78);
