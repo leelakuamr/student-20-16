@@ -20,6 +20,7 @@ import Gamification from "./pages/Gamification";
 import CalendarPage from "./pages/Calendar";
 import ContactTeachersPage from "./pages/ContactTeachers";
 import AdminTeachersPage from "./pages/AdminTeachers";
+import ProfilePage from "./pages/Profile";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
 
