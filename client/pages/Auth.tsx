@@ -119,8 +119,8 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
                 className="ml-2 rounded-md border px-2 py-1"
               >
                 <option value="student">Student</option>
-                <option value="instructor">Instructor</option>
-                <option value="parent">Parent</option>
+                <option value="instructor">Instructor / Teacher</option>
+                <option value="parent">Parent / Guardian</option>
               </select>
               <p className="mt-1 text-xs text-muted-foreground">Choose how you’ll use the app (you can change later).</p>
             </div>
@@ -147,6 +147,30 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
           </div>
         </form>
       </div>
+
+      <section className="mx-auto mt-6 max-w-3xl rounded-lg border p-4">
+        <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold">
+          <span aria-hidden>👥</span> Role-Based Access Control
+        </h2>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-md border p-3">
+            <div className="font-medium">Platform Admin</div>
+            <p className="text-sm text-muted-foreground">System management, user oversight, content moderation, analytics</p>
+          </div>
+          <div className="rounded-md border p-3">
+            <div className="font-medium">Instructor / Teacher</div>
+            <p className="text-sm text-muted-foreground">Course creation, student management, grading</p>
+          </div>
+          <div className="rounded-md border p-3">
+            <div className="font-medium">Student</div>
+            <p className="text-sm text-muted-foreground">Course access, assignments, progress viewing, peer interaction</p>
+          </div>
+          <div className="rounded-md border p-3">
+            <div className="font-medium">Parent / Guardian</div>
+            <p className="text-sm text-muted-foreground">Child progress monitoring, teacher communication</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
