@@ -15,8 +15,8 @@ export function BottomNav() {
     : "/dashboard";
   const items = [
     { to: home, label: "Home", icon: Home },
-    { to: "/discussions", label: "Discussions", icon: MessageCircle },
-    { to: "/calendar", label: "Calendar", icon: Calendar },
+    ...(user?.role === "student" ? [{ to: "/discussions", label: "Discussions", icon: MessageCircle } as const] : []),
+    ...(user?.role === "student" ? [{ to: "/calendar", label: "Calendar", icon: Calendar } as const] : []),
     { to: "/profile", label: "Profile", icon: User },
   ];
 
