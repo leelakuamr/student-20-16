@@ -13,10 +13,10 @@ export default function Index() {
         <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/10 to-transparent" aria-hidden />
         <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-2 lg:items-center relative">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
+            <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl text-white drop-shadow">
               EdTech Personalized Learning Platform
             </h1>
-            <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+            <p className="mt-4 max-w-xl text-lg text-white/90">
               Adaptive learning that tailors content to each student using
               progress tracking and AI-driven recommendations.
             </p>
