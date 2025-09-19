@@ -4,13 +4,25 @@ export default function Instructor() {
     { id: "c2", title: "Chemistry Basics", students: 24, assignments: 10 },
   ];
   const submissions = [
-    { id: "s1", student: "Rohan", assignment: "Quadratic HW", status: "submitted" },
-    { id: "s2", student: "Aisha", assignment: "Lab Report 1", status: "graded" },
+    {
+      id: "s1",
+      student: "Rohan",
+      assignment: "Quadratic HW",
+      status: "submitted",
+    },
+    {
+      id: "s2",
+      student: "Aisha",
+      assignment: "Lab Report 1",
+      status: "graded",
+    },
   ];
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold">Instructor Console</h1>
-      <p className="mt-1 text-muted-foreground">Create courses, manage students, and review work.</p>
+      <p className="mt-1 text-muted-foreground">
+        Create courses, manage students, and review work.
+      </p>
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold">Your Courses</h2>
@@ -21,8 +33,18 @@ export default function Instructor() {
               <div key={c.id} className="rounded-lg border p-3">
                 <div className="font-medium">{c.title}</div>
                 <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                  <div><span className="font-semibold text-foreground">{c.students}</span> students</div>
-                  <div><span className="font-semibold text-foreground">{c.assignments}</span> assignments</div>
+                  <div>
+                    <span className="font-semibold text-foreground">
+                      {c.students}
+                    </span>{" "}
+                    students
+                  </div>
+                  <div>
+                    <span className="font-semibold text-foreground">
+                      {c.assignments}
+                    </span>{" "}
+                    assignments
+                  </div>
                 </div>
               </div>
             ))}
@@ -61,7 +83,9 @@ export default function Instructor() {
                 <div className="font-medium">{s.student}</div>
                 <div className="mt-1 text-sm">{s.assignment}</div>
                 <div className="mt-2">
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{s.status}</span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                    {s.status}
+                  </span>
                 </div>
               </div>
             ))}
@@ -82,7 +106,9 @@ export default function Instructor() {
                     <td className="p-3">{s.student}</td>
                     <td className="p-3">{s.assignment}</td>
                     <td className="p-3">
-                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{s.status}</span>
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                        {s.status}
+                      </span>
                     </td>
                   </tr>
                 ))}

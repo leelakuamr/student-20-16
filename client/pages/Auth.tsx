@@ -4,7 +4,11 @@ import { useAuth } from "@/hooks/useAuth";
 
 type Mode = "login" | "register";
 
-export default function Auth({ initialMode = "login" as Mode }: { initialMode?: Mode }) {
+export default function Auth({
+  initialMode = "login" as Mode,
+}: {
+  initialMode?: Mode;
+}) {
   const { login, register } = useAuth();
   const [mode, setMode] = useState<Mode>(initialMode);
   const nav = useNavigate();
@@ -22,7 +26,8 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
 
   const emailValid = /.+@.+\..+/.test(email);
   const passValid = password.length >= 6;
-  const canSubmit = emailValid && passValid && (mode === "login" || name.trim().length > 0);
+  const canSubmit =
+    emailValid && passValid && (mode === "login" || name.trim().length > 0);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,7 +71,15 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
           </div>
         </div>
 
-        {err && <div className="mt-2 text-sm text-destructive" role="alert" aria-live="polite">{err}</div>}
+        {err && (
+          <div
+            className="mt-2 text-sm text-destructive"
+            role="alert"
+            aria-live="polite"
+          >
+            {err}
+          </div>
+        )}
 
         <form onSubmit={onSubmit} className="mt-4 space-y-3" noValidate>
           {mode === "register" && (
@@ -88,7 +101,9 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
               required
               aria-invalid={!emailValid}
             />
-            <p className="mt-1 text-xs text-muted-foreground">Use your school or personal email.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Use your school or personal email.
+            </p>
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -105,7 +120,11 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
             <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
               <span>At least 6 characters.</span>
               <label className="inline-flex items-center gap-1">
-                <input type="checkbox" checked={showPass} onChange={(e) => setShowPass(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={showPass}
+                  onChange={(e) => setShowPass(e.target.checked)}
+                />
                 Show password
               </label>
             </div>
@@ -122,17 +141,26 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
                 <option value="instructor">Instructor / Teacher</option>
                 <option value="parent">Parent / Guardian</option>
               </select>
-              <p className="mt-1 text-xs text-muted-foreground">Choose how you’ll use the app (you can change later).</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Choose how you’ll use the app (you can change later).
+              </p>
             </div>
           )}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <label className="inline-flex items-center gap-1 text-sm">
-                <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
                 Remember me
               </label>
             </div>
-            <button disabled={!canSubmit} className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">
+            <button
+              disabled={!canSubmit}
+              className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
+            >
               {mode === "login" ? "Sign in" : "Create account"}
             </button>
           </div>
@@ -142,7 +170,9 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
               onClick={() => setMode(mode === "login" ? "register" : "login")}
               className="text-sm text-muted-foreground hover:underline"
             >
-              {mode === "login" ? "Need an account?" : "Already have an account?"}
+              {mode === "login"
+                ? "Need an account?"
+                : "Already have an account?"}
             </button>
           </div>
         </form>
@@ -155,19 +185,27 @@ export default function Auth({ initialMode = "login" as Mode }: { initialMode?: 
         <div className="grid gap-3 md:grid-cols-2">
           <div className="rounded-md border p-3">
             <div className="font-medium">Platform Admin</div>
-            <p className="text-sm text-muted-foreground">System management, user oversight, content moderation, analytics</p>
+            <p className="text-sm text-muted-foreground">
+              System management, user oversight, content moderation, analytics
+            </p>
           </div>
           <div className="rounded-md border p-3">
             <div className="font-medium">Instructor / Teacher</div>
-            <p className="text-sm text-muted-foreground">Course creation, student management, grading</p>
+            <p className="text-sm text-muted-foreground">
+              Course creation, student management, grading
+            </p>
           </div>
           <div className="rounded-md border p-3">
             <div className="font-medium">Student</div>
-            <p className="text-sm text-muted-foreground">Course access, assignments, progress viewing, peer interaction</p>
+            <p className="text-sm text-muted-foreground">
+              Course access, assignments, progress viewing, peer interaction
+            </p>
           </div>
           <div className="rounded-md border p-3">
             <div className="font-medium">Parent / Guardian</div>
-            <p className="text-sm text-muted-foreground">Child progress monitoring, teacher communication</p>
+            <p className="text-sm text-muted-foreground">
+              Child progress monitoring, teacher communication
+            </p>
           </div>
         </div>
       </section>

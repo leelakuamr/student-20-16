@@ -23,8 +23,16 @@ export const handleGetProgress: RequestHandler = async (req, res) => {
 export const handleGetRecommendations: RequestHandler = async (req, res) => {
   // Very simple rule-based recommendations for MVP
   const items = [
-    { id: "r1", title: "Practice Linear Equations", reason: "Struggling with recent quiz" },
-    { id: "r2", title: "Watch Atoms & Bonds", reason: "Low engagement in science module" },
+    {
+      id: "r1",
+      title: "Practice Linear Equations",
+      reason: "Struggling with recent quiz",
+    },
+    {
+      id: "r2",
+      title: "Watch Atoms & Bonds",
+      reason: "Low engagement in science module",
+    },
   ];
   res.json({ items });
 };
@@ -34,14 +42,24 @@ const sseClients: import("http").ServerResponse[] = [];
 export const handleDiscussions: RequestHandler = async (req, res) => {
   if (req.method === "GET") {
     const discussions = await readJSON("discussions.json", [
-      { id: "d1", author: "Rohan", content: "How do I solve eqn #3?", createdAt: new Date().toISOString() },
+      {
+        id: "d1",
+        author: "Rohan",
+        content: "How do I solve eqn #3?",
+        createdAt: new Date().toISOString(),
+      },
     ]);
     return res.json({ posts: discussions });
   }
   if (req.method === "POST") {
     const { content } = req.body as { content: string };
     const discussions = await readJSON("discussions.json", [] as any[]);
-    const post = { id: genId("post"), author: "You", content, createdAt: new Date().toISOString() };
+    const post = {
+      id: genId("post"),
+      author: "You",
+      content,
+      createdAt: new Date().toISOString(),
+    };
     discussions.unshift(post);
     await writeJSON("discussions.json", discussions);
 
@@ -110,9 +128,19 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     return res.json({ submissions });
   }
   if (req.method === "POST") {
-    const { filename, contentBase64, note } = req.body as { filename: string; contentBase64?: string; note?: string };
+    const { filename, contentBase64, note } = req.body as {
+      filename: string;
+      contentBase64?: string;
+      note?: string;
+    };
     const submissions = await readJSON("submissions.json", [] as any[]);
-    const s: any = { id: genId("sub"), filename: filename ?? `notes-${Date.now()}.txt`, submittedAt: new Date().toISOString(), status: "submitted", note: note ?? undefined };
+    const s: any = {
+      id: genId("sub"),
+      filename: filename ?? `notes-${Date.now()}.txt`,
+      submittedAt: new Date().toISOString(),
+      status: "submitted",
+      note: note ?? undefined,
+    };
     // save file if provided
     if (contentBase64) {
       try {
