@@ -62,6 +62,7 @@ export function createServer() {
   app.delete('/api/users/me', usersRoutes.deleteMe);
   app.delete('/api/users/:id', usersRoutes.deleteUserById);
   app.get('/api/users', usersRoutes.listUsers);
+  app.put('/api/users/me', usersRoutes.updateMe);
 
   // Contact teachers
   app.get('/api/teachers', contactRoutes.listTeachers);
