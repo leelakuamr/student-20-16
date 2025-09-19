@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { getAuth, getFirestore } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 type Mode = "login" | "register";
 
@@ -38,7 +40,21 @@ export default function Auth({
       } else {
         await register(name, email, password, role, remember);
       }
-      nav("/dashboard");
+      // Redirect by role
+      try {
+        const auth = getAuth();
+        const db = getFirestore();
+        const uid = auth.currentUser?.uid;
+        let dest = "/dashboard";
+        if (uid) {
+          const snap = await getDoc(doc(db, "users", uid));
+          const r = (snap.exists() ? (snap.data() as any).role : undefined) || "student";
+          dest = r === "admin" ? "/admin" : r === "instructor" ? "/instructor" : r === "parent" ? "/parent" : "/dashboard";
+        }
+        nav(dest);
+      } catch {
+        nav("/dashboard");
+      }
     } catch (e) {
       setErr(mode === "login" ? "Login failed" : "Registration failed");
     }
