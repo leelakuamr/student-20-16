@@ -35,6 +35,7 @@ export function createServer() {
   app.get("/api/progress", edu.handleGetProgress);
   app.get("/api/recommendations", edu.handleGetRecommendations);
   app.all("/api/discussions", edu.handleDiscussions);
+  app.get("/api/discussions/stream", edu.handleDiscussionStream);
   app.all("/api/assignments", edu.handleAssignments);
 
   // Auth
