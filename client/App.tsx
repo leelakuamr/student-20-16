@@ -73,13 +73,45 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route path="/discussions" element={<Discussions />} />
-              <Route path="/study-groups" element={<StudyGroups />} />
-              <Route path="/gamification" element={<Gamification />} />
-              <Route path="/calendar" element={<CalendarPage />} />
+              <Route
+                path="/discussions"
+                element={
+                  <ProtectedRoute roles={["student"]}>
+                    <Discussions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/study-groups"
+                element={
+                  <ProtectedRoute roles={["student"]}>
+                    <StudyGroups />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gamification"
+                element={
+                  <ProtectedRoute roles={["student"]}>
+                    <Gamification />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/calendar"
+                element={
+                  <ProtectedRoute roles={["student"]}>
+                    <CalendarPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/contact-teachers"
-                element={<ContactTeachersPage />}
+                element={
+                  <ProtectedRoute roles={["student"]}>
+                    <ContactTeachersPage />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/admin/teachers"
