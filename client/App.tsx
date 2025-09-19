@@ -19,6 +19,7 @@ import StudyGroups from "./pages/StudyGroups";
 import Gamification from "./pages/Gamification";
 import CalendarPage from "./pages/Calendar";
 import ContactTeachersPage from "./pages/ContactTeachers";
+import AdminTeachersPage from "./pages/AdminTeachers";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
 
