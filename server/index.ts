@@ -10,6 +10,8 @@ import * as gm from "./routes/gamification";
 import * as usersRoutes from "./routes/users";
 import { initFirebase } from "./firebase";
 
+initFirebase();
+
 export function createServer() {
   const app = express();
 
