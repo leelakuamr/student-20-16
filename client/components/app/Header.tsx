@@ -10,6 +10,7 @@ const navItems = [
   { to: "/instructor", label: "Instructor" },
   { to: "/admin", label: "Admin" },
   { to: "/parent", label: "Parent" },
+  { to: "/contact-teachers", label: "Contact" },
 ];
 
 export function Header() {
