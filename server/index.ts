@@ -34,6 +34,7 @@ export function createServer() {
   app.get("/api/progress", edu.handleGetProgress);
   app.get("/api/recommendations", edu.handleGetRecommendations);
   app.all("/api/discussions", edu.handleDiscussions);
+  app.delete("/api/discussions/:id", edu.handleDeleteDiscussion);
   app.get("/api/discussions/stream", edu.handleDiscussionStream);
   app.all("/api/assignments", edu.handleAssignments);
 
