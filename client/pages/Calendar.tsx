@@ -1,5 +1,8 @@
 import { CalendarWidget } from "@/components/app/CalendarWidget";
 
+import * as React from "react";
+import { CalendarWidget } from "@/components/app/CalendarWidget";
+
 function toICSEvent(title: string, dt: Date) {
   const dtstamp = dt.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   return `BEGIN:VEVENT\nUID:${title}-${dt.getTime()}\nDTSTAMP:${dtstamp}\nDTSTART:${dtstamp}\nSUMMARY:${title}\nEND:VEVENT\n`;
