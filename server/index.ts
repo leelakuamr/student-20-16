@@ -65,6 +65,7 @@ export function createServer() {
 
   // Contact teachers
   app.get('/api/teachers', contactRoutes.listTeachers);
+  app.post('/api/teachers', contactRoutes.createTeacher);
   app.post('/api/contact-teacher', contactRoutes.sendMessageToTeacher);
   app.get('/api/messages', contactRoutes.listMessages);
 
