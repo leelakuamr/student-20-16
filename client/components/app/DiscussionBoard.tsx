@@ -47,9 +47,13 @@ export function DiscussionBoard() {
         console.error(e);
       }
     };
-    es.onerror = (e) => {
-      // reconnect handled by browser automatically
-      console.error("SSE error", e);
+    let errored = false;
+    es.onerror = () => {
+      // reconnect handled by browser automatically; avoid noisy logs
+      if (!errored) {
+        console.warn("SSE connection lost, retrying...");
+        errored = true;
+      }
     };
     return () => {
       es.close();
