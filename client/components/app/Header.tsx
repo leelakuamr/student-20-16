@@ -189,48 +189,63 @@ function AccessibilityControls() {
 
 function AuthControls() {
   const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <Link
-          to="/login"
-          className="text-sm text-foreground/80 hover:underline"
-        >
+        <Link to="/login" className="text-sm text-foreground/80 hover:underline">
           Sign In
         </Link>
-        <Link
-          to="/register"
-          className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
-        >
+        <Link to="/register" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground">
           Sign Up
         </Link>
       </div>
     );
   }
+
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm font-medium">{user.name}</span>
+    <div className="relative">
       <button
-        onClick={async () => {
-          if (!confirm("Delete your account? This will remove your data.")) return;
-          try {
-            const token = localStorage.getItem("token");
-            await fetch("/api/users/me", { method: "DELETE", headers: { Authorization: token ? `Bearer ${token}` : "" } });
-          } catch (e) {
-            console.error(e);
-          }
-          logout();
-        }}
-        className="text-sm text-destructive hover:text-destructive-foreground"
+        onClick={() => setOpen((s) => !s)}
+        aria-expanded={open}
+        className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-accent/40"
       >
-        Delete account
+        <div className="h-8 w-8 rounded-full bg-accent-2 flex items-center justify-center text-sm font-medium">{user.name?.charAt(0) ?? "U"}</div>
+        <span className="text-sm font-medium hidden sm:inline">{user.name}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-muted-foreground">
+          <path d="M6 9l6 6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
-      <button
-        onClick={() => logout()}
-        className="text-sm text-muted-foreground hover:text-foreground"
-      >
-        Logout
-      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-48 rounded-md border bg-card p-2 shadow-lg z-50">
+          <button
+            onClick={async () => {
+              if (!confirm("Delete your account? This will remove your data.")) return;
+              try {
+                const token = localStorage.getItem("token");
+                await fetch("/api/users/me", { method: "DELETE", headers: { Authorization: token ? `Bearer ${token}` : "" } });
+              } catch (e) {
+                console.error(e);
+              }
+              logout();
+            }}
+            className="w-full text-left rounded px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
+          >
+            Delete account
+          </button>
+          <button
+            onClick={() => {
+              setOpen(false);
+              logout();
+            }}
+            className="w-full text-left rounded px-2 py-1 text-sm text-muted-foreground hover:bg-muted/30"
+          >
+            Logout
+          </button>
+        </div>
+      )}
     </div>
   );
 }
