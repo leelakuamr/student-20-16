@@ -1,13 +1,33 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, MessageCircle, Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 export function BottomNav() {
   const location = useLocation();
+  const { user } = useAuth();
+  const home =
+    user?.role === "admin"
+      ? "/admin"
+      : user?.role === "instructor"
+        ? "/instructor"
+        : user?.role === "parent"
+          ? "/parent"
+          : "/dashboard";
   const items = [
-    { to: "/dashboard", label: "Home", icon: Home },
-    { to: "/discussions", label: "Discussions", icon: MessageCircle },
-    { to: "/calendar", label: "Calendar", icon: Calendar },
+    { to: home, label: "Home", icon: Home },
+    ...(user?.role === "student"
+      ? [
+          {
+            to: "/discussions",
+            label: "Discussions",
+            icon: MessageCircle,
+          } as const,
+        ]
+      : []),
+    ...(user?.role === "student"
+      ? [{ to: "/calendar", label: "Calendar", icon: Calendar } as const]
+      : []),
     { to: "/profile", label: "Profile", icon: User },
   ];
 
@@ -23,7 +43,7 @@ export function BottomNav() {
                 to={it.to}
                 className={cn(
                   "flex flex-col items-center gap-1 text-xs text-foreground/70",
-                  active && "text-primary"
+                  active && "text-primary",
                 )}
               >
                 <Icon size={18} />

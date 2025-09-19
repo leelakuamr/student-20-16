@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -11,7 +12,7 @@ const navItems = [
   { to: "/admin", label: "Admin" },
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
-];
+] as const;
 
 export function Header() {
   const location = useLocation();
@@ -52,10 +53,35 @@ export function Header() {
         </button>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {navItems.map((item) => (
+          {navItems
+            .filter((item) => {
+              const role = user?.role;
+              if (item.to === "/admin") return role === "admin";
+              if (item.to === "/instructor")
+                return role === "instructor" || role === "admin";
+              if (item.to === "/parent")
+                return role === "parent" || role === "admin";
+              if (item.to === "/dashboard") return !!user; // any authenticated user
+              return true; // public
+            })
+            .map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                    isActive &&
+                      "bg-primary text-primary-foreground hover:bg-primary/90",
+                  )
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          {user?.role === "student" && (
             <NavLink
-              key={item.to}
-              to={item.to}
+              to="/discussions"
               className={({ isActive }) =>
                 cn(
                   "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
@@ -64,57 +90,72 @@ export function Header() {
                 )
               }
             >
-              {item.label}
+              Discussions
             </NavLink>
-          ))}
-          <NavLink
-            to="/discussions"
-            className={({ isActive }) =>
-              cn(
-                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive &&
-                  "bg-primary text-primary-foreground hover:bg-primary/90",
-              )
-            }
-          >
-            Discussions
-          </NavLink>
-          <NavLink
-            to="/study-groups"
-            className={({ isActive }) =>
-              cn(
-                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive &&
-                  "bg-primary text-primary-foreground hover:bg-primary/90",
-              )
-            }
-          >
-            Study Groups
-          </NavLink>
-          <NavLink
-            to="/gamification"
-            className={({ isActive }) =>
-              cn(
-                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive &&
-                  "bg-primary text-primary-foreground hover:bg-primary/90",
-              )
-            }
-          >
-            Gamification
-          </NavLink>
-          <NavLink
-            to="/calendar"
-            className={({ isActive }) =>
-              cn(
-                "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                isActive &&
-                  "bg-primary text-primary-foreground hover:bg-primary/90",
-              )
-            }
-          >
-            Calendar
-          </NavLink>
+          )}
+          {user?.role === "student" && (
+            <NavLink
+              to="/study-groups"
+              onClick={(e) => {
+                e.preventDefault();
+                toast({
+                  title: "Coming soon",
+                  description: "Collaborative study groups",
+                });
+              }}
+              className={({ isActive }) =>
+                cn(
+                  "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                  isActive &&
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
+                )
+              }
+            >
+              Study Groups
+            </NavLink>
+          )}
+          {user?.role === "student" && (
+            <NavLink
+              to="/gamification"
+              onClick={(e) => {
+                e.preventDefault();
+                toast({
+                  title: "Coming soon",
+                  description: "Gamification (badges, leaderboards)",
+                });
+              }}
+              className={({ isActive }) =>
+                cn(
+                  "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                  isActive &&
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
+                )
+              }
+            >
+              Gamification
+            </NavLink>
+          )}
+          {user?.role === "student" && (
+            <NavLink
+              to="/calendar"
+              onClick={(e) => {
+                e.preventDefault();
+                toast({
+                  title: "Coming soon",
+                  description: "Calendar integration",
+                });
+              }}
+              className={({ isActive }) =>
+                cn(
+                  "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                  isActive &&
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
+                )
+              }
+            >
+              Calendar
+            </NavLink>
+          )}
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
@@ -139,48 +180,88 @@ export function Header() {
         <div className="md:hidden border-t bg-white">
           <div className="px-4 py-3">
             <ul className="flex flex-col gap-1">
-              {navItems.map((it) => (
-                <li key={it.to}>
+              {navItems
+                .filter((item) => {
+                  const role = user?.role;
+                  if (item.to === "/admin") return role === "admin";
+                  if (item.to === "/instructor")
+                    return role === "instructor" || role === "admin";
+                  if (item.to === "/parent")
+                    return role === "parent" || role === "admin";
+                  if (item.to === "/dashboard") return !!user;
+                  return true;
+                })
+                .map((it) => (
+                  <li key={it.to}>
+                    <NavLink
+                      to={it.to}
+                      className="block rounded-md px-3 py-2 text-base"
+                    >
+                      {it.label}
+                    </NavLink>
+                  </li>
+                ))}
+              {user?.role === "student" && (
+                <li>
                   <NavLink
-                    to={it.to}
+                    to="/discussions"
                     className="block rounded-md px-3 py-2 text-base"
                   >
-                    {it.label}
+                    Discussions
                   </NavLink>
                 </li>
-              ))}
-              <li>
-                <NavLink
-                  to="/discussions"
-                  className="block rounded-md px-3 py-2 text-base"
-                >
-                  Discussions
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/study-groups"
-                  className="block rounded-md px-3 py-2 text-base"
-                >
-                  Study Groups
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/gamification"
-                  className="block rounded-md px-3 py-2 text-base"
-                >
-                  Gamification
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/calendar"
-                  className="block rounded-md px-3 py-2 text-base"
-                >
-                  Calendar
-                </NavLink>
-              </li>
+              )}
+              {user?.role === "student" && (
+                <li>
+                  <NavLink
+                    to="/study-groups"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast({
+                        title: "Coming soon",
+                        description: "Collaborative study groups",
+                      });
+                    }}
+                    className="block rounded-md px-3 py-2 text-base"
+                  >
+                    Study Groups
+                  </NavLink>
+                </li>
+              )}
+              {user?.role === "student" && (
+                <li>
+                  <NavLink
+                    to="/gamification"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast({
+                        title: "Coming soon",
+                        description: "Gamification (badges, leaderboards)",
+                      });
+                    }}
+                    className="block rounded-md px-3 py-2 text-base"
+                  >
+                    Gamification
+                  </NavLink>
+                </li>
+              )}
+              {user?.role === "student" && (
+                <li>
+                  <NavLink
+                    to="/calendar"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast({
+                        title: "Coming soon",
+                        description: "Calendar integration",
+                      });
+                    }}
+                    className="block rounded-md px-3 py-2 text-base"
+                  >
+                    Calendar
+                  </NavLink>
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -230,7 +311,7 @@ function AccessibilityControls() {
 }
 
 function AuthControls() {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const [open, setOpen] = useState(false);
 
   if (!user) {
@@ -300,7 +381,6 @@ function AuthControls() {
                 )
                   return;
                 try {
-                  const token = localStorage.getItem("token");
                   await fetch("/api/users/me", {
                     method: "DELETE",
                     headers: { Authorization: token ? `Bearer ${token}` : "" },

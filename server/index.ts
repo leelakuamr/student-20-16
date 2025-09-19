@@ -7,6 +7,7 @@ import * as edu from "./routes/education";
 import * as ai from "./routes/ai";
 import * as gm from "./routes/gamification";
 import * as usersRoutes from "./routes/users";
+import * as adminRoutes from "./routes/admin";
 import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
 // Firebase Admin not initialized; client handles auth
@@ -63,6 +64,9 @@ export function createServer() {
   app.delete("/api/users/:id", usersRoutes.deleteUserById);
   app.get("/api/users", usersRoutes.listUsers);
   app.put("/api/users/me", usersRoutes.updateMe);
+
+  // Admin
+  app.post("/api/admin/role", adminRoutes.setUserRole);
 
   // Contact teachers
   app.get("/api/teachers", contactRoutes.listTeachers);

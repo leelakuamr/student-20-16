@@ -86,7 +86,14 @@ export const handleDiscussionStream: RequestHandler = async (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no"); // disable proxy buffering if any
   res.flushHeaders?.();
+
+  // immediately notify client and configure retry
+  try {
+    res.write(`retry: 5000\n`);
+    res.write(`: connected\n\n`);
+  } catch {}
 
   // send a ping comment every 30s to keep connection alive
   const ping = setInterval(() => {

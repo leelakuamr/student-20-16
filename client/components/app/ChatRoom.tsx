@@ -21,8 +21,13 @@ export function ChatRoom({ roomName = "Global" }: { roomName?: string }) {
         console.error("chat parse", e);
       }
     };
+    let errored = false;
     es.onerror = () => {
       setConnected(false);
+      if (!errored) {
+        console.warn("Chat SSE connection lost, retrying...");
+        errored = true;
+      }
       // let browser attempt reconnect
     };
 
