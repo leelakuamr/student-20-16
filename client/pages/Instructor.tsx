@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export default function Instructor() {
   const [courses, setCourses] = useState<
     { id: string; title: string; students: number; assignments: number }[]
