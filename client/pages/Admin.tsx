@@ -1,3 +1,5 @@
+import { AdminRoleManager } from "@/components/app/AdminRoleManager";
+
 export default function Admin() {
   const metrics = [
     { label: "Active Users", value: 1240 },
@@ -22,6 +24,8 @@ export default function Admin() {
           </div>
         ))}
       </section>
+
+      <AdminRoleManager />
 
       <section className="mt-8 overflow-hidden rounded-xl border">
         <div className="border-b p-4 text-sm font-semibold">
