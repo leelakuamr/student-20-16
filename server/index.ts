@@ -10,6 +10,7 @@ import * as usersRoutes from "./routes/users";
 import * as adminRoutes from "./routes/admin";
 import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
+import * as courses from "./routes/courses";
 // Firebase Admin not initialized; client handles auth
 
 export function createServer() {
