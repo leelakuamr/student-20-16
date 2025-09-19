@@ -4,7 +4,12 @@ export default function Index() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 py-24">
+      <section
+        className="relative overflow-hidden py-24 bg-cover bg-center"
+        style={{
+          backgroundImage: `url("https://cdn.builder.io/api/v1/image/assets%2F6537cfbe07534dcaaab34b64f1fd2f9f%2Fbfcc2617082b459bbf7fa0e1482426c2?format=webp&width=1600")`,
+        }}
+      >
         <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-2 lg:items-center">
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
