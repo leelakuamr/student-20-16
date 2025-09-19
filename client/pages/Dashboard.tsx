@@ -102,21 +102,30 @@ export default function Dashboard() {
 
         <section className="space-y-3 rounded-xl border bg-white/60 p-6 shadow-sm dark:bg-background">
           <h2 className="text-lg font-semibold">Add-On Features</h2>
-          <p className="text-sm text-muted-foreground">Explore upcoming enhancements.</p>
+          <p className="text-sm text-muted-foreground">
+            Explore upcoming enhancements.
+          </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              { key: "gamification", label: "Gamification (badges, leaderboards)" },
+              {
+                key: "gamification",
+                label: "Gamification (badges, leaderboards)",
+              },
               { key: "groups", label: "Collaborative study groups" },
               { key: "calendar", label: "Calendar integration" },
               { key: "a11y", label: "Accessibility features" },
             ].map((it) => (
               <button
                 key={it.key}
-                onClick={() => toast({ title: "Coming soon", description: it.label })}
+                onClick={() =>
+                  toast({ title: "Coming soon", description: it.label })
+                }
                 className="flex items-center justify-between rounded-lg border px-3 py-2 text-left hover:bg-accent"
               >
                 <span className="text-sm font-medium">{it.label}</span>
-                <span aria-hidden className="text-muted-foreground">→</span>
+                <span aria-hidden className="text-muted-foreground">
+                  →
+                </span>
               </button>
             ))}
           </div>

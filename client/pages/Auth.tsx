@@ -48,8 +48,17 @@ export default function Auth({
         let dest = "/dashboard";
         if (uid) {
           const snap = await getDoc(doc(db, "users", uid));
-          const r = (snap.exists() ? (snap.data() as any).role : undefined) || "student";
-          dest = r === "admin" ? "/admin" : r === "instructor" ? "/instructor" : r === "parent" ? "/parent" : "/dashboard";
+          const r =
+            (snap.exists() ? (snap.data() as any).role : undefined) ||
+            "student";
+          dest =
+            r === "admin"
+              ? "/admin"
+              : r === "instructor"
+                ? "/instructor"
+                : r === "parent"
+                  ? "/parent"
+                  : "/dashboard";
         }
         nav(dest);
       } catch {

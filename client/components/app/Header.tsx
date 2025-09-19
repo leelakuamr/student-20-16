@@ -57,8 +57,10 @@ export function Header() {
             .filter((item) => {
               const role = user?.role;
               if (item.to === "/admin") return role === "admin";
-              if (item.to === "/instructor") return role === "instructor" || role === "admin";
-              if (item.to === "/parent") return role === "parent" || role === "admin";
+              if (item.to === "/instructor")
+                return role === "instructor" || role === "admin";
+              if (item.to === "/parent")
+                return role === "parent" || role === "admin";
               if (item.to === "/dashboard") return !!user; // any authenticated user
               return true; // public
             })
@@ -96,7 +98,10 @@ export function Header() {
               to="/study-groups"
               onClick={(e) => {
                 e.preventDefault();
-                toast({ title: "Coming soon", description: "Collaborative study groups" });
+                toast({
+                  title: "Coming soon",
+                  description: "Collaborative study groups",
+                });
               }}
               className={({ isActive }) =>
                 cn(
@@ -114,7 +119,10 @@ export function Header() {
               to="/gamification"
               onClick={(e) => {
                 e.preventDefault();
-                toast({ title: "Coming soon", description: "Gamification (badges, leaderboards)" });
+                toast({
+                  title: "Coming soon",
+                  description: "Gamification (badges, leaderboards)",
+                });
               }}
               className={({ isActive }) =>
                 cn(
@@ -132,7 +140,10 @@ export function Header() {
               to="/calendar"
               onClick={(e) => {
                 e.preventDefault();
-                toast({ title: "Coming soon", description: "Calendar integration" });
+                toast({
+                  title: "Coming soon",
+                  description: "Calendar integration",
+                });
               }}
               className={({ isActive }) =>
                 cn(
@@ -173,8 +184,10 @@ export function Header() {
                 .filter((item) => {
                   const role = user?.role;
                   if (item.to === "/admin") return role === "admin";
-                  if (item.to === "/instructor") return role === "instructor" || role === "admin";
-                  if (item.to === "/parent") return role === "parent" || role === "admin";
+                  if (item.to === "/instructor")
+                    return role === "instructor" || role === "admin";
+                  if (item.to === "/parent")
+                    return role === "parent" || role === "admin";
                   if (item.to === "/dashboard") return !!user;
                   return true;
                 })
@@ -204,7 +217,10 @@ export function Header() {
                     to="/study-groups"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast({ title: "Coming soon", description: "Collaborative study groups" });
+                      toast({
+                        title: "Coming soon",
+                        description: "Collaborative study groups",
+                      });
                     }}
                     className="block rounded-md px-3 py-2 text-base"
                   >
@@ -218,7 +234,10 @@ export function Header() {
                     to="/gamification"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast({ title: "Coming soon", description: "Gamification (badges, leaderboards)" });
+                      toast({
+                        title: "Coming soon",
+                        description: "Gamification (badges, leaderboards)",
+                      });
                     }}
                     className="block rounded-md px-3 py-2 text-base"
                   >
@@ -232,7 +251,10 @@ export function Header() {
                     to="/calendar"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast({ title: "Coming soon", description: "Calendar integration" });
+                      toast({
+                        title: "Coming soon",
+                        description: "Calendar integration",
+                      });
                     }}
                     className="block rounded-md px-3 py-2 text-base"
                   >
