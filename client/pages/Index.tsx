@@ -4,19 +4,13 @@ export default function Index() {
   return (
     <div>
       {/* Hero */}
-      <section
-        className="relative overflow-hidden py-24 bg-cover bg-center"
-        style={{
-          backgroundImage: `url("https://cdn.builder.io/api/v1/image/assets%2F6537cfbe07534dcaaab34b64f1fd2f9f%2Fbfcc2617082b459bbf7fa0e1482426c2?format=webp&width=1600")`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/10 to-transparent" aria-hidden />
-        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-2 lg:items-center relative">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 py-24">
+        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-2 lg:items-center">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl text-white drop-shadow">
+            <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
               EdTech Personalized Learning Platform
             </h1>
-            <p className="mt-4 max-w-xl text-lg text-white/90">
+            <p className="mt-4 max-w-xl text-lg text-muted-foreground">
               Adaptive learning that tailors content to each student using
               progress tracking and AI-driven recommendations.
             </p>
@@ -29,13 +23,15 @@ export default function Index() {
               </Link>
               <Link
                 to="/instructor"
-                className="rounded-md border border-white/30 px-5 py-3 text-white/90 hover:bg-white/10"
+                className="rounded-md border px-5 py-3 hover:bg-accent hover:text-accent-foreground"
               >
                 For Instructors
               </Link>
             </div>
-            <div className="mt-6 flex flex-wrap items-center gap-2 text-sm">
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-white">Gamification</span>
+            <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">
+                Gamification
+              </span>
               <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">
                 Study Groups
               </span>
