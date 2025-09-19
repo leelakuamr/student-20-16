@@ -15,6 +15,7 @@ import Parent from "./pages/Parent";
 import Discussions from "./pages/Discussions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Auth from "./pages/Auth";
 import StudyGroups from "./pages/StudyGroups";
 import Gamification from "./pages/Gamification";
 import CalendarPage from "./pages/Calendar";
