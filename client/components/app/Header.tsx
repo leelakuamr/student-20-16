@@ -165,6 +165,21 @@ function AuthControls() {
     <div className="flex items-center gap-3">
       <span className="text-sm font-medium">{user.name}</span>
       <button
+        onClick={async () => {
+          if (!confirm("Delete your account? This will remove your data.")) return;
+          try {
+            const token = localStorage.getItem("token");
+            await fetch("/api/users/me", { method: "DELETE", headers: { Authorization: token ? `Bearer ${token}` : "" } });
+          } catch (e) {
+            console.error(e);
+          }
+          logout();
+        }}
+        className="text-sm text-destructive hover:text-destructive-foreground"
+      >
+        Delete account
+      </button>
+      <button
         onClick={() => logout()}
         className="text-sm text-muted-foreground hover:text-foreground"
       >
