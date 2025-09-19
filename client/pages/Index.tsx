@@ -10,7 +10,8 @@ export default function Index() {
           backgroundImage: `url("https://cdn.builder.io/api/v1/image/assets%2F6537cfbe07534dcaaab34b64f1fd2f9f%2Fbfcc2617082b459bbf7fa0e1482426c2?format=webp&width=1600")`,
         }}
       >
-        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-2 lg:items-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/10 to-transparent" aria-hidden />
+        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-2 lg:items-center relative">
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
               EdTech Personalized Learning Platform
