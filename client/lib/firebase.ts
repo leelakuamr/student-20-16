@@ -46,6 +46,17 @@ export function getAuth(): Auth {
 }
 
 export function getFirestore(): Firestore {
-  if (!firestore) firestore = _getFirestore(getFirebaseApp());
+  if (!firestore) {
+    const app = getFirebaseApp();
+    try {
+      firestore = initializeFirestore(app, {
+        experimentalAutoDetectLongPolling: true,
+        useFetchStreams: false,
+      });
+    } catch (_e) {
+      // Fallback to default if initializeFirestore already called elsewhere
+      firestore = _getFirestore(app);
+    }
+  }
   return firestore;
 }
