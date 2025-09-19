@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { ChatBot } from "./ChatBot";
+import { BottomNav } from "./BottomNav";
 
 export function Layout({ children }: PropsWithChildren) {
   return (
@@ -18,6 +19,7 @@ export function Layout({ children }: PropsWithChildren) {
       </main>
       <Footer />
       <ChatBot />
+      <BottomNav />
     </div>
   );
 }
