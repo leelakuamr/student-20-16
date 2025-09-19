@@ -248,7 +248,7 @@ function AccessibilityControls() {
 }
 
 function AuthControls() {
-  const { user, logout, token } = useAuth() as any;
+  const { user, logout, token } = useAuth();
   const [open, setOpen] = useState(false);
 
   if (!user) {
