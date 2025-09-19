@@ -45,9 +45,11 @@ export const streamMessages: RequestHandler = async (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders?.();
 
-  // send initial comment
+  // send initial comment and retry hint
+  res.write(`retry: 5000\n`);
   res.write(`: connected\n\n`);
 
   const ping = setInterval(() => {
