@@ -228,16 +228,10 @@ function AuthControls() {
     return (
       <div className="flex items-center gap-2">
         <Link
-          to="/login"
-          className="text-sm text-foreground/80 hover:underline"
-        >
-          Sign In
-        </Link>
-        <Link
-          to="/register"
+          to="/auth"
           className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
         >
-          Sign Up
+          Sign in / up
         </Link>
       </div>
     );
