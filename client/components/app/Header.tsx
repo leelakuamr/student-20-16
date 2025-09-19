@@ -14,6 +14,7 @@ const navItems = [
 
 export function Header() {
   const location = useLocation();
+  const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-background/70">
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
@@ -23,6 +24,21 @@ export function Header() {
             AdeptLearn
           </span>
         </Link>
+
+        <button
+          aria-label="Toggle menu"
+          onClick={() => setOpen((s) => !s)}
+          className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
+            {open ? (
+              <path d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
             <NavLink
@@ -97,6 +113,35 @@ export function Header() {
           <AuthControls />
         </div>
       </div>
+
+      {/* mobile menu */}
+      {open && (
+        <div className="md:hidden border-t bg-white">
+          <div className="px-4 py-3">
+            <ul className="flex flex-col gap-1">
+              {navItems.map((it) => (
+                <li key={it.to}>
+                  <NavLink to={it.to} className="block rounded-md px-3 py-2 text-base">
+                    {it.label}
+                  </NavLink>
+                </li>
+              ))}
+              <li>
+                <NavLink to="/discussions" className="block rounded-md px-3 py-2 text-base">Discussions</NavLink>
+              </li>
+              <li>
+                <NavLink to="/study-groups" className="block rounded-md px-3 py-2 text-base">Study Groups</NavLink>
+              </li>
+              <li>
+                <NavLink to="/gamification" className="block rounded-md px-3 py-2 text-base">Gamification</NavLink>
+              </li>
+              <li>
+                <NavLink to="/calendar" className="block rounded-md px-3 py-2 text-base">Calendar</NavLink>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
