@@ -1,5 +1,3 @@
-import { CalendarWidget } from "@/components/app/CalendarWidget";
-
 import * as React from "react";
 import { CalendarWidget } from "@/components/app/CalendarWidget";
 
