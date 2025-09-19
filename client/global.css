@@ -13,19 +13,19 @@
   */
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 5%;
+    --foreground: 220 13% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 5%;
+    --card-foreground: 220 13% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 5%;
+    --popover-foreground: 220 13% 15%;
 
-    /* Brand: Indigo primary, Teal secondary, Amber accent */
-    --primary: 248 84% 60%;
+    /* Updated Brand: Teal primary, Indigo secondary, Amber accent */
+    --primary: 174 66% 38%; /* teal */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 172 66% 40%;
+    --secondary: 238 100% 40%; /* indigo-ish */
     --secondary-foreground: 210 40% 98%;
 
     --muted: 210 40% 96.1%;
@@ -39,15 +39,15 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 248 84% 60%;
+    --ring: 174 66% 38%;
 
-    --radius: 0.75rem;
+    --radius: 0.85rem;
 
     --sidebar-background: 0 0% 99%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
 
-    --sidebar-primary: 248 84% 60%;
+    --sidebar-primary: 174 66% 38%;
 
     --sidebar-primary-foreground: 0 0% 100%;
 
@@ -57,7 +57,11 @@
 
     --sidebar-border: 220 13% 91%;
 
-    --sidebar-ring: 248 84% 60%;
+    --sidebar-ring: 174 66% 38%;
+
+    /* Typography scale */
+    --base-font-size: 16px;
+    --scale-ratio: 1.125;
   }
 
   .dark {
