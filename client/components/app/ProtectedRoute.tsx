@@ -30,12 +30,15 @@ export function ProtectedRoute({
     return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
   }
 
+  const effectiveRole = user.role ?? "student";
   if (
     roles &&
-    user.role !== "admin" &&
-    (!user.role || !roles.includes(user.role))
+    effectiveRole !== "admin" &&
+    !roles.includes(effectiveRole)
   ) {
-    return <Navigate to={homeFor(user.role)} replace />;
+    const dest = homeFor(effectiveRole);
+    if (dest === location.pathname) return <Navigate to="/" replace />;
+    return <Navigate to={dest} replace />;
   }
 
   return children;
