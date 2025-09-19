@@ -11,7 +11,7 @@ const navItems = [
   { to: "/admin", label: "Admin" },
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
-];
+] as const;
 
 export function Header() {
   const location = useLocation();
@@ -52,21 +52,30 @@ export function Header() {
         </button>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                cn(
-                  "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
-                  isActive &&
-                    "bg-primary text-primary-foreground hover:bg-primary/90",
-                )
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {navItems
+            .filter((item) => {
+              const role = user?.role;
+              if (item.to === "/admin") return role === "admin";
+              if (item.to === "/instructor") return role === "instructor" || role === "admin";
+              if (item.to === "/parent") return role === "parent" || role === "admin";
+              if (item.to === "/dashboard") return !!user; // any authenticated user
+              return true; // public
+            })
+            .map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+                    isActive &&
+                      "bg-primary text-primary-foreground hover:bg-primary/90",
+                  )
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
           <NavLink
             to="/discussions"
             className={({ isActive }) =>
@@ -139,16 +148,25 @@ export function Header() {
         <div className="md:hidden border-t bg-white">
           <div className="px-4 py-3">
             <ul className="flex flex-col gap-1">
-              {navItems.map((it) => (
-                <li key={it.to}>
-                  <NavLink
-                    to={it.to}
-                    className="block rounded-md px-3 py-2 text-base"
-                  >
-                    {it.label}
-                  </NavLink>
-                </li>
-              ))}
+              {navItems
+                .filter((item) => {
+                  const role = user?.role;
+                  if (item.to === "/admin") return role === "admin";
+                  if (item.to === "/instructor") return role === "instructor" || role === "admin";
+                  if (item.to === "/parent") return role === "parent" || role === "admin";
+                  if (item.to === "/dashboard") return !!user;
+                  return true;
+                })
+                .map((it) => (
+                  <li key={it.to}>
+                    <NavLink
+                      to={it.to}
+                      className="block rounded-md px-3 py-2 text-base"
+                    >
+                      {it.label}
+                    </NavLink>
+                  </li>
+                ))}
               <li>
                 <NavLink
                   to="/discussions"
@@ -230,7 +248,7 @@ function AccessibilityControls() {
 }
 
 function AuthControls() {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth() as any;
   const [open, setOpen] = useState(false);
 
   if (!user) {
@@ -300,7 +318,6 @@ function AuthControls() {
                 )
                   return;
                 try {
-                  const token = localStorage.getItem("token");
                   await fetch("/api/users/me", {
                     method: "DELETE",
                     headers: { Authorization: token ? `Bearer ${token}` : "" },
