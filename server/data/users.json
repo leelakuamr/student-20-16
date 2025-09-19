@@ -29,5 +29,14 @@
     "salt": "8ea8956433c09d5fde9ff2aecacfb96a",
     "role": "student",
     "token": "64cd3aceade8ec3dfcee1def8331d2a35d783a1679dfbf1e3ba3d2fad990daf0"
+  },
+  {
+    "id": "u_mfqd5qfd_fjhf9l",
+    "name": "leela",
+    "email": "leela@gmail.com",
+    "passwordHash": "8669261c5cfbe0402657c3de82498a83b5449f27d1b6ef5450c2127173c587b5aa925b6532db0d6a314569e0f88adea166103b449fa2b35894b01258de04a429",
+    "salt": "174c6a1a3607ce6a7526c7f0fd474107",
+    "role": "student",
+    "token": "762a4dc5e152302910c31dc7b2affddd4274ddd2b3923ccac0ca1445cbaa6ae5"
   }
 ]
