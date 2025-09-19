@@ -7,6 +7,7 @@ import * as edu from "./routes/education";
 import * as auth from "./routes/auth";
 import * as ai from "./routes/ai";
 import * as gm from "./routes/gamification";
+import * as usersRoutes from "./routes/users";
 
 export function createServer() {
   const app = express();
