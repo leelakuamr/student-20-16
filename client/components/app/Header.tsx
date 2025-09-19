@@ -61,7 +61,7 @@ export function Header() {
                 return role === "instructor" || role === "admin";
               if (item.to === "/parent")
                 return role === "parent" || role === "admin";
-              if (item.to === "/dashboard") return !!user; // any authenticated user
+              if (item.to === "/dashboard") return user?.role === "student";
               return true; // public
             })
             .map((item) => (
@@ -188,7 +188,7 @@ export function Header() {
                     return role === "instructor" || role === "admin";
                   if (item.to === "/parent")
                     return role === "parent" || role === "admin";
-                  if (item.to === "/dashboard") return !!user;
+                  if (item.to === "/dashboard") return user?.role === "student";
                   return true;
                 })
                 .map((it) => (
