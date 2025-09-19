@@ -8,10 +8,26 @@ export function AssignmentForm() {
   const [note, setNote] = useState("");
 
   async function submit() {
+    let contentBase64: string | undefined = undefined;
+    if (file) {
+      contentBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          // result is data:<mime>;base64,AAAA -> strip prefix
+          const idx = result.indexOf("base64,");
+          const b64 = idx >= 0 ? result.slice(idx + 7) : result;
+          resolve(b64);
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
     const res = await fetch("/api/assignments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: file?.name ?? "notes.txt", note }),
+      body: JSON.stringify({ filename: file?.name ?? `notes-${Date.now()}.txt`, contentBase64, note }),
     });
     if (res.ok) {
       const data = (await res.json()) as { submission: Submission };
@@ -20,6 +36,21 @@ export function AssignmentForm() {
       setNote("");
     }
   }
+
+  // fetch existing submissions
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/assignments");
+        if (res.ok) {
+          const data = (await res.json()) as { submissions: Submission[] };
+          setSubmissions(data.submissions);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
 
   return (
     <div className="space-y-4">
