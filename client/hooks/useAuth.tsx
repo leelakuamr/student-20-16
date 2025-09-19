@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getAuth, getFirestore } from "@/lib/firebase";
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 type User = { id: string; name: string; role?: string } | null;
@@ -8,8 +8,8 @@ type User = { id: string; name: string; role?: string } | null;
 type AuthContext = {
   user: User;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role?: string) => Promise<void>;
+  login: (email: string, password: string, remember?: boolean) => Promise<void>;
+  register: (name: string, email: string, password: string, role?: string, remember?: boolean) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -34,14 +34,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsub();
   }, []);
 
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string, remember = true) {
     const auth = getAuth();
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
     await signInWithEmailAndPassword(auth, email, password);
   }
 
-  async function register(name: string, email: string, password: string, role?: string) {
+  async function register(name: string, email: string, password: string, role?: string, remember = true) {
     const auth = getAuth();
     const db = getFirestore();
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     try {
       if (name) await updateProfile(cred.user, { displayName: name });
