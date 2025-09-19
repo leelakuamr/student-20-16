@@ -30,4 +30,57 @@ export function initFirebase() {
   }
 }
 
+function ensureInitialized() {
+  if (!initialized) {
+    throw new Error("Firebase Admin not initialized. Call initFirebase() and ensure service account provided.");
+  }
+}
+
+export function getAuth() {
+  ensureInitialized();
+  return admin.auth();
+}
+
+export async function verifyIdToken(idToken: string) {
+  ensureInitialized();
+  return admin.auth().verifyIdToken(idToken);
+}
+
+export async function createUser(options: { email: string; password?: string; displayName?: string; uid?: string; disabled?: boolean; }) {
+  ensureInitialized();
+  const userRecord = await admin.auth().createUser(options as any);
+  return userRecord;
+}
+
+export async function getUserByEmail(email: string) {
+  ensureInitialized();
+  return admin.auth().getUserByEmail(email);
+}
+
+export async function listUsers(maxResults = 1000) {
+  ensureInitialized();
+  const list = await admin.auth().listUsers(maxResults);
+  return list;
+}
+
+export async function setCustomClaims(uid: string, claims: Record<string, any>) {
+  ensureInitialized();
+  await admin.auth().setCustomUserClaims(uid, claims);
+}
+
+export async function createCustomToken(uid: string, claims?: Record<string, any>) {
+  ensureInitialized();
+  return admin.auth().createCustomToken(uid, claims);
+}
+
+export function getFirestore() {
+  ensureInitialized();
+  return admin.firestore();
+}
+
+export function getStorage() {
+  ensureInitialized();
+  return admin.storage();
+}
+
 export { admin };
