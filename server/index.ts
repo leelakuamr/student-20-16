@@ -63,6 +63,11 @@ export function createServer() {
   app.delete('/api/users/:id', usersRoutes.deleteUserById);
   app.get('/api/users', usersRoutes.listUsers);
 
+  // Contact teachers
+  app.get('/api/teachers', contactRoutes.listTeachers);
+  app.post('/api/contact-teacher', contactRoutes.sendMessageToTeacher);
+  app.get('/api/messages', contactRoutes.listMessages);
+
   // error handler
   const err = require("./middleware/error").errorHandler;
   app.use(err);
