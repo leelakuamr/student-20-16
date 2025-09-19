@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "msg_mfqcx811_fpmg90",
+    "teacherId": "t1",
+    "subject": "maths",
+    "message": "small doubt",
+    "fromName": "leelakumar",
+    "fromEmail": "1234@gmail.com",
+    "createdAt": "2025-09-19T04:46:11.173Z",
+    "read": false
+  }
+]
