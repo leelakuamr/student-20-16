@@ -1,6 +1,19 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
+function homeFor(role?: string) {
+  switch (role) {
+    case "admin":
+      return "/admin";
+    case "instructor":
+      return "/instructor";
+    case "parent":
+      return "/parent";
+    default:
+      return "/dashboard";
+  }
+}
+
 export function ProtectedRoute({
   children,
   roles,
@@ -21,7 +34,7 @@ export function ProtectedRoute({
     !roles.includes(user.role) &&
     user.role !== "admin"
   ) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={homeFor(user.role)} replace />;
   }
 
   return children;
