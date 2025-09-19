@@ -23,6 +23,24 @@ export function DiscussionBoard() {
         setLoading(false);
       }
     })();
+
+    // open SSE connection for live updates
+    const es = new EventSource("/api/discussions/stream");
+    es.onmessage = (ev) => {
+      try {
+        const payload = JSON.parse(ev.data) as { post: Post };
+        setPosts((prev) => [payload.post, ...prev]);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    es.onerror = (e) => {
+      // reconnect handled by browser automatically
+      console.error("SSE error", e);
+    };
+    return () => {
+      es.close();
+    };
   }, []);
 
   const submit = async () => {
