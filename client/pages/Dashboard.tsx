@@ -59,6 +59,14 @@ export default function Dashboard() {
         </section>
 
         <section className="space-y-4">
+          <h2 className="text-lg font-semibold">Learning Videos</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <VideoPlayer src="https://www.youtube.com/watch?v=H14bBuluwB8" title="Study Tips: Focus & Time" />
+            <VideoPlayer src="https://www.youtube.com/watch?v=ysz5S6PUM-U" title="Quadratics Recap" />
+          </div>
+        </section>
+
+        <section className="space-y-4">
           <h2 className="text-lg font-semibold">Discussion Forum</h2>
           <DiscussionBoard />
         </section>
