@@ -14,7 +14,7 @@ export function Layout({ children }: PropsWithChildren) {
       </a>
       <Header />
       <main id="content" className="flex-1">
-        {children}
+        <div className="container mx-auto px-4 py-6">{children}</div>
       </main>
       <Footer />
       <ChatBot />
