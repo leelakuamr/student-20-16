@@ -52,6 +52,12 @@ export function createServer() {
   app.get("/api/events", gm.getEvents);
   app.post("/api/events", gm.createEvent);
 
+  // User management
+  const usersRoutes = await import('./routes/users');
+  app.delete('/api/users/me', usersRoutes.deleteMe);
+  app.delete('/api/users/:id', usersRoutes.deleteUserById);
+  app.get('/api/users', usersRoutes.listUsers);
+
   // error handler
   const err = require("./middleware/error").errorHandler;
   app.use(err);
