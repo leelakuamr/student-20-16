@@ -90,6 +90,20 @@ export const handleDiscussionStream: RequestHandler = async (req, res) => {
   });
 };
 
+export const handleDeleteDiscussion: RequestHandler = async (req, res) => {
+  const { id } = req.params as { id?: string };
+  if (!id) return res.status(400).json({ error: "id is required" });
+
+  const discussions = await readJSON("discussions.json", [] as any[]);
+  const idx = discussions.findIndex((d: any) => d.id === id);
+  if (idx === -1) return res.status(404).json({ error: "Not found" });
+
+  discussions.splice(idx, 1);
+  await writeJSON("discussions.json", discussions);
+
+  return res.json({ ok: true });
+};
+
 export const handleAssignments: RequestHandler = async (req, res) => {
   if (req.method === "GET") {
     const submissions = await readJSON("submissions.json", [] as any[]);
