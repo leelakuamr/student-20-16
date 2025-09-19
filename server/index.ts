@@ -40,6 +40,10 @@ export function createServer() {
   app.get("/api/discussions/stream", edu.handleDiscussionStream);
   app.all("/api/assignments", edu.handleAssignments);
 
+  // Courses
+  app.get("/api/courses", courses.listCourses);
+  app.post("/api/courses", courses.createCourse);
+
   // Chat
   app.get("/api/chat", chatRoutes.getMessages);
   app.post("/api/chat", chatRoutes.postMessage);
