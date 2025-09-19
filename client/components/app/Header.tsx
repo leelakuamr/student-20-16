@@ -220,30 +220,34 @@ function AuthControls() {
 
       {open && (
         <div className="absolute right-0 mt-2 w-48 rounded-md border bg-card p-2 shadow-lg z-50">
-          <button
-            onClick={async () => {
-              if (!confirm("Delete your account? This will remove your data.")) return;
-              try {
-                const token = localStorage.getItem("token");
-                await fetch("/api/users/me", { method: "DELETE", headers: { Authorization: token ? `Bearer ${token}` : "" } });
-              } catch (e) {
-                console.error(e);
-              }
-              logout();
-            }}
-            className="w-full text-left rounded px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
-          >
-            Delete account
-          </button>
-          <button
-            onClick={() => {
-              setOpen(false);
-              logout();
-            }}
-            className="w-full text-left rounded px-2 py-1 text-sm text-muted-foreground hover:bg-muted/30"
-          >
-            Logout
-          </button>
+          <Link to="/profile" onClick={() => setOpen(false)} className="block w-full text-left rounded px-2 py-1 text-sm hover:bg-accent/40">Profile</Link>
+          <Link to="/settings" onClick={() => setOpen(false)} className="block w-full text-left rounded px-2 py-1 text-sm hover:bg-accent/40">Settings</Link>
+          <div className="mt-1 border-t pt-1">
+            <button
+              onClick={async () => {
+                if (!confirm("Delete your account? This will remove your data.")) return;
+                try {
+                  const token = localStorage.getItem("token");
+                  await fetch("/api/users/me", { method: "DELETE", headers: { Authorization: token ? `Bearer ${token}` : "" } });
+                } catch (e) {
+                  console.error(e);
+                }
+                logout();
+              }}
+              className="w-full text-left rounded px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
+            >
+              Delete account
+            </button>
+            <button
+              onClick={() => {
+                setOpen(false);
+                logout();
+              }}
+              className="w-full text-left rounded px-2 py-1 text-sm text-muted-foreground hover:bg-muted/30"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       )}
     </div>
