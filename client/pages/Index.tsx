@@ -29,15 +29,13 @@ export default function Index() {
               </Link>
               <Link
                 to="/instructor"
-                className="rounded-md border px-5 py-3 hover:bg-accent hover:text-accent-foreground"
+                className="rounded-md border border-white/30 px-5 py-3 text-white/90 hover:bg-white/10"
               >
                 For Instructors
               </Link>
             </div>
-            <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">
-                Gamification
-              </span>
+            <div className="mt-6 flex flex-wrap items-center gap-2 text-sm">
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-white">Gamification</span>
               <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">
                 Study Groups
               </span>
