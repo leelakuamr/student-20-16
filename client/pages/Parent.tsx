@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ContactTeachers } from "@/components/app/ContactTeachers";
 
 export default function Parent() {
   const [child] = useState({ name: "Anika", grade: "8" });
@@ -101,7 +103,17 @@ export default function Parent() {
           </div>
           <div className="overflow-hidden rounded-xl border p-4">
             <p className="text-sm font-semibold">Contact Teachers</p>
-            <button className="mt-3 w-full rounded-md border px-3 py-2 hover:bg-accent">Start a Message</button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="mt-3 w-full rounded-md border px-3 py-2 hover:bg-accent">Start a Message</button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                  <DialogTitle>Start a message</DialogTitle>
+                </DialogHeader>
+                <ContactTeachers />
+              </DialogContent>
+            </Dialog>
           </div>
         </aside>
       </section>
