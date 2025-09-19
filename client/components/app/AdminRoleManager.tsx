@@ -29,7 +29,7 @@ const ROLE_LABEL: Record<AppRole, string> = {
 };
 
 export function AdminRoleManager() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<AppUser[]>([]);
@@ -77,6 +77,23 @@ export function AdminRoleManager() {
         role: newRole,
         updatedAt: serverTimestamp(),
       });
+
+      // Attempt to propagate role to custom claims via backend (best-effort)
+      try {
+        if (token) {
+          await fetch("/api/admin/role", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ uid, role: newRole }),
+          });
+        }
+      } catch (e) {
+        // ignore backend errors here
+      }
+
       setUsers((list) =>
         list.map((u) => (u.uid === uid ? { ...u, role: newRole } : u)),
       );
