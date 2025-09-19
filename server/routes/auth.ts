@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import crypto from "crypto";
 import { readJSON, writeJSON } from "../utils/db";
+import { isFirebaseAdminReady, admin } from "../firebase";
 
 type User = {
   id: string;
@@ -30,6 +31,37 @@ export const handleRegister: RequestHandler = async (req, res) => {
   if (!name || !email || !password) return res.status(400).json({ error: "Missing fields" });
   const users = await readJSON<User[]>("users.json", []);
   if (users.find((u) => u.email === email)) return res.status(409).json({ error: "Email exists" });
+
+  // If Firebase Admin is available, create the user there as the source of truth
+  if (isFirebaseAdminReady()) {
+    try {
+      const firebaseUser = await admin.auth().createUser({
+        email,
+        password,
+        displayName: name,
+      });
+      // Optionally persist a local mirror entry for compatibility with existing flows
+      const localUser: User = {
+        id: firebaseUser.uid,
+        name,
+        email,
+        passwordHash: "",
+        salt: "",
+        role: (role as any) ?? "student",
+        token: null,
+      };
+      users.push(localUser);
+      await writeJSON("users.json", users);
+      return res.status(201).json({ id: localUser.id, name: localUser.name, role: localUser.role });
+    } catch (err: any) {
+      if (err?.code === "auth/email-already-exists") {
+        return res.status(409).json({ error: "Email exists" });
+      }
+      return res.status(500).json({ error: "Failed to create user" });
+    }
+  }
+
+  // Fallback: local JSON store
   const salt = crypto.randomBytes(16).toString("hex");
   const passwordHash = hashPassword(password, salt);
   const user: User = {

@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { getAuth, getFirestore } from "@/lib/firebase";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 type User = { id: string; name: string; role?: string } | null;
 
@@ -14,56 +17,56 @@ const ctx = createContext<AuthContext | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      if (!token) return;
-      try {
-        const res = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
-        if (res.ok) {
-          const data = await res.json();
-          setUser({ id: data.id, name: data.name, role: data.role });
-        } else {
-          setToken(null);
-          localStorage.removeItem("token");
-        }
-      } catch (e) {
+    const auth = getAuth();
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      if (!fbUser) {
+        setUser(null);
         setToken(null);
-        localStorage.removeItem("token");
+        return;
       }
-    })();
-  }, [token]);
+      const idToken = await fbUser.getIdToken();
+      setToken(idToken);
+      setUser({ id: fbUser.uid, name: fbUser.displayName || fbUser.email || "" });
+    });
+    return () => unsub();
+  }, []);
 
   async function login(email: string, password: string) {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!res.ok) throw new Error("Login failed");
-    const data = await res.json();
-    setToken(data.token);
-    localStorage.setItem("token", data.token);
-    setUser({ id: data.id, name: data.name, role: data.role });
+    const auth = getAuth();
+    await signInWithEmailAndPassword(auth, email, password);
   }
 
   async function register(name: string, email: string, password: string, role?: string) {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role }),
-    });
-    if (!res.ok) throw new Error("Register failed");
-    // auto-login
-    await login(email, password);
+    const auth = getAuth();
+    const db = getFirestore();
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    try {
+      if (name) await updateProfile(cred.user, { displayName: name });
+    } catch (e) {
+      console.warn("updateProfile failed", e);
+    }
+    try {
+      await setDoc(doc(db, "users", cred.user.uid), {
+        uid: cred.user.uid,
+        name: name || cred.user.displayName || "",
+        email: cred.user.email,
+        role: role || "student",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+    } catch (e) {
+      console.warn("setDoc profile failed (account still created)", e);
+    }
   }
 
   async function logout() {
-    if (token) await fetch("/api/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+    const auth = getAuth();
+    await signOut(auth);
     setToken(null);
     setUser(null);
-    localStorage.removeItem("token");
   }
 
   return <ctx.Provider value={{ user, token, login, register, logout }}>{children}</ctx.Provider>;

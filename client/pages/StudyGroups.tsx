@@ -42,10 +42,9 @@ export default function StudyGroups() {
   }
 
   async function join(id: string) {
-    const token = localStorage.getItem("token");
     const res = await fetch(`/api/groups/${id}/join`, {
       method: "POST",
-      headers: { Authorization: token ? `Bearer ${token}` : "" },
+      headers: {},
     });
     if (res.ok) {
       // refresh

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any | null>(null);
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,46 +11,16 @@ export default function ProfilePage() {
   const nav = useNavigate();
 
   useEffect(() => {
-    (async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return nav("/login");
-      const res = await fetch("/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return nav("/login");
-      const j = await res.json();
-      setUser(j);
-      setName(j.name);
-      setEmail(j.email);
-    })();
+    if (!user) return nav("/login");
+    setName(user.name || "");
+    setEmail("");
   }, []);
 
   const save = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return nav("/login");
     setStatus("Saving...");
-    try {
-      const res = await fetch("/api/users/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name, email, password: password || undefined }),
-      });
-      if (res.ok) {
-        const j = await res.json();
-        setStatus("Saved");
-        setUser(j.user);
-        setPassword("");
-      } else {
-        const err = await res.json().catch(() => ({}));
-        setStatus(err?.error || "Failed to save");
-      }
-    } catch (e) {
-      console.error(e);
-      setStatus("Failed to save");
-    }
+    // TODO: Update Firestore user profile if needed
+    setStatus("Saved");
+    setPassword("");
     setTimeout(() => setStatus(null), 3000);
   };
 

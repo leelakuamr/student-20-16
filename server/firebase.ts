@@ -30,6 +30,10 @@ export function initFirebase() {
   }
 }
 
+export function isFirebaseAdminReady() {
+  return initialized;
+}
+
 function ensureInitialized() {
   if (!initialized) {
     throw new Error("Firebase Admin not initialized. Call initFirebase() and ensure service account provided.");

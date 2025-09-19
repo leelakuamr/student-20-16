@@ -15,20 +15,18 @@ export function ChatBot() {
     if (!open) return;
     (async () => {
       // load history if available
-      if (token) {
-        try {
-          const res = await fetch('/api/ai/history', { headers: { Authorization: `Bearer ${token}` } });
-          if (res.ok) {
-            const j = await res.json();
-            const items: Msg[] = (j.items || []).map((it: any, idx: number) => ({ id: `h_${idx}_${it.time || Date.now()}`, from: it.role === 'user' ? 'user' : 'bot', text: it.content }));
-            if (items.length) {
-              setMessages(items);
-              return;
-            }
+      try {
+        const res = await fetch('/api/ai/history');
+        if (res.ok) {
+          const j = await res.json();
+          const items: Msg[] = (j.items || []).map((it: any, idx: number) => ({ id: `h_${idx}_${it.time || Date.now()}`, from: it.role === 'user' ? 'user' : 'bot', text: it.content }));
+          if (items.length) {
+            setMessages(items);
+            return;
           }
-        } catch (e) {
-          console.error('history load error', e);
         }
+      } catch (e) {
+        console.error('history load error', e);
       }
       // greet if no history
       if (messages.length === 0) {
@@ -53,7 +51,6 @@ export function ChatBot() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ messages: [{ role: "user", content: userMsg.text }] }),
       });

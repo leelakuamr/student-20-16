@@ -26,12 +26,10 @@ export function AdminTeachers() {
   const add = async () => {
     setStatus(null);
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch("/api/teachers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ name, email, password }),
       });

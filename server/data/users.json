@@ -38,5 +38,14 @@
     "salt": "174c6a1a3607ce6a7526c7f0fd474107",
     "role": "student",
     "token": "762a4dc5e152302910c31dc7b2affddd4274ddd2b3923ccac0ca1445cbaa6ae5"
+  },
+  {
+    "id": "u_mfqvdnn1_pdcpir",
+    "name": "Venky",
+    "email": "evenkateshvenky2717@gmail.com",
+    "passwordHash": "0c2853051edcd4b021fd3bb2e290552967fb89b38b19ad6c1df82e36ed3d35e1814acb4a037941f61f23048dde200aa956e695b82d4a7023cc66e7ba9cbdd617",
+    "salt": "53d43d374ee6a865920de91c9f1e93e6",
+    "role": "student",
+    "token": "623d3b2fcd44837fd67ff7fd4add39ad6db3c378e940b9c99987c9397e6ba794"
   }
 ]

@@ -18,18 +18,7 @@ export default function Gamification() {
         console.error(e);
       }
 
-      // load current user if token present
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const ures = await fetch("/api/auth/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (ures.ok) setUser(await ures.json());
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      // No server auth; rely on client AuthContext in UI components
     })();
   }, []);
 
@@ -41,13 +30,11 @@ export default function Gamification() {
     }
 
     const payload = { userId: user.id, title: "Consistency Champ" };
-    const token = localStorage.getItem("token");
     try {
       const r = await fetch("/api/badges", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(payload),
       });

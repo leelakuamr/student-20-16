@@ -4,15 +4,12 @@ import cors from "cors";
 import path from "path";
 import { handleDemo } from "./routes/demo";
 import * as edu from "./routes/education";
-import * as auth from "./routes/auth";
 import * as ai from "./routes/ai";
 import * as gm from "./routes/gamification";
 import * as usersRoutes from "./routes/users";
 import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
-import { initFirebase } from "./firebase";
-
-initFirebase();
+// Firebase Admin not initialized; client handles auth
 
 export function createServer() {
   const app = express();
@@ -45,11 +42,7 @@ export function createServer() {
   app.post("/api/chat", chatRoutes.postMessage);
   app.get("/api/chat/stream", chatRoutes.streamMessages);
 
-  // Auth
-  app.post("/api/auth/register", auth.handleRegister);
-  app.post("/api/auth/login", auth.handleLogin);
-  app.post("/api/auth/logout", auth.handleLogout);
-  app.get("/api/auth/me", auth.handleMe);
+  // Auth routes removed: handled by Firebase client SDK now
 
   // AI
   app.post("/api/ai/chat", ai.handleChat);
