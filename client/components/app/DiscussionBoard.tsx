@@ -8,6 +8,19 @@ export function DiscussionBoard() {
   const [loading, setLoading] = useState(false);
   const maxLen = 500;
 
+  const remove = async (id: string) => {
+    const ok = window.confirm("Delete this post?");
+    if (!ok) return;
+    try {
+      const res = await fetch(`/api/discussions/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== id));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -122,7 +135,16 @@ export function DiscussionBoard() {
               <div className="flex-1">
                 <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
                   <span className="font-medium text-foreground">{p.author}</span>
-                  <time dateTime={p.createdAt}>{new Date(p.createdAt).toLocaleString()}</time>
+                  <div className="flex items-center gap-3">
+                    <time dateTime={p.createdAt}>{new Date(p.createdAt).toLocaleString()}</time>
+                    <button
+                      className="text-rose-600 hover:underline disabled:opacity-50"
+                      aria-label="Delete post"
+                      onClick={() => remove(p.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
                 <p className="whitespace-pre-wrap">{p.content}</p>
               </div>
