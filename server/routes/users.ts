@@ -70,3 +70,29 @@ export const listUsers: RequestHandler = async (_req, res) => {
   const users = await readJSON("users.json", [] as any[]);
   res.json({ users });
 };
+
+export const updateMe: RequestHandler = async (req, res) => {
+  const auth = (req.headers.authorization || "").replace("Bearer ", "");
+  if (!auth) return res.status(401).json({ error: "Unauthorized" });
+  const users = await readJSON("users.json", [] as any[]);
+  const idx = users.findIndex((u) => u.token === auth);
+  if (idx === -1) return res.status(401).json({ error: "Unauthorized" });
+
+  const { name, email, password } = req.body as { name?: string; email?: string; password?: string };
+  if (email && users.find((u) => u.email === email && u.id !== users[idx].id)) {
+    return res.status(409).json({ error: "Email exists" });
+  }
+
+  if (name) users[idx].name = name;
+  if (email) users[idx].email = email;
+  if (password) {
+    const crypto = await import("crypto");
+    const salt = crypto.randomBytes(16).toString("hex");
+    const passwordHash = crypto.pbkdf2Sync(password, salt, 100_000, 64, "sha512").toString("hex");
+    users[idx].salt = salt;
+    users[idx].passwordHash = passwordHash;
+  }
+
+  await writeJSON("users.json", users);
+  res.json({ ok: true, user: { id: users[idx].id, name: users[idx].name, email: users[idx].email, role: users[idx].role } });
+};
