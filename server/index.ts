@@ -8,6 +8,7 @@ import * as auth from "./routes/auth";
 import * as ai from "./routes/ai";
 import * as gm from "./routes/gamification";
 import * as usersRoutes from "./routes/users";
+import * as contactRoutes from "./routes/contact";
 import { initFirebase } from "./firebase";
 
 initFirebase();
