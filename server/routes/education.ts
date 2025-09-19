@@ -96,9 +96,9 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     return res.json({ submissions });
   }
   if (req.method === "POST") {
-    const { filename, contentBase64 } = req.body as { filename: string; contentBase64?: string };
+    const { filename, contentBase64, note } = req.body as { filename: string; contentBase64?: string; note?: string };
     const submissions = await readJSON("submissions.json", [] as any[]);
-    const s = { id: genId("sub"), filename, submittedAt: new Date().toISOString(), status: "submitted" } as any;
+    const s: any = { id: genId("sub"), filename: filename ?? `notes-${Date.now()}.txt`, submittedAt: new Date().toISOString(), status: "submitted", note: note ?? undefined };
     // save file if provided
     if (contentBase64) {
       try {
@@ -107,11 +107,25 @@ export const handleAssignments: RequestHandler = async (req, res) => {
         const path = await import("path");
         const uploadsDir = path.resolve(__dirname, "../uploads");
         await fs.mkdir(uploadsDir, { recursive: true });
-        const filePath = path.join(uploadsDir, `${s.id}_${filename}`);
+        const filePath = path.join(uploadsDir, `${s.id}_${s.filename}`);
         await fs.writeFile(filePath, buffer);
-        s.path = `/uploads/${s.id}_${filename}`;
+        s.path = `/uploads/${s.id}_${s.filename}`;
       } catch (e) {
         console.error("file save error", e);
+      }
+    } else if (note) {
+      // save note as a text file for convenience
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        const uploadsDir = path.resolve(__dirname, "../uploads");
+        await fs.mkdir(uploadsDir, { recursive: true });
+        const fileName = `${s.id}_note.txt`;
+        const filePath = path.join(uploadsDir, fileName);
+        await fs.writeFile(filePath, note, "utf-8");
+        s.path = `/uploads/${fileName}`;
+      } catch (e) {
+        console.error("note save error", e);
       }
     }
     submissions.unshift(s);
