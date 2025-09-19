@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -90,6 +91,10 @@ export function Header() {
           </NavLink>
           <NavLink
             to="/study-groups"
+            onClick={(e) => {
+              e.preventDefault();
+              toast({ title: "Coming soon", description: "Collaborative study groups" });
+            }}
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
@@ -102,6 +107,10 @@ export function Header() {
           </NavLink>
           <NavLink
             to="/gamification"
+            onClick={(e) => {
+              e.preventDefault();
+              toast({ title: "Coming soon", description: "Gamification (badges, leaderboards)" });
+            }}
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
@@ -114,6 +123,10 @@ export function Header() {
           </NavLink>
           <NavLink
             to="/calendar"
+            onClick={(e) => {
+              e.preventDefault();
+              toast({ title: "Coming soon", description: "Calendar integration" });
+            }}
             className={({ isActive }) =>
               cn(
                 "rounded-md px-3 py-2 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground",
@@ -178,6 +191,10 @@ export function Header() {
               <li>
                 <NavLink
                   to="/study-groups"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toast({ title: "Coming soon", description: "Collaborative study groups" });
+                  }}
                   className="block rounded-md px-3 py-2 text-base"
                 >
                   Study Groups
@@ -186,6 +203,10 @@ export function Header() {
               <li>
                 <NavLink
                   to="/gamification"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toast({ title: "Coming soon", description: "Gamification (badges, leaderboards)" });
+                  }}
                   className="block rounded-md px-3 py-2 text-base"
                 >
                   Gamification
@@ -194,6 +215,10 @@ export function Header() {
               <li>
                 <NavLink
                   to="/calendar"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toast({ title: "Coming soon", description: "Calendar integration" });
+                  }}
                   className="block rounded-md px-3 py-2 text-base"
                 >
                   Calendar
