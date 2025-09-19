@@ -11,5 +11,14 @@
     "salt": "7ea476ed6a74dbbb6c247357af580331",
     "role": "student",
     "token": null
+  },
+  {
+    "id": "u_mfq5pot1_2hwvdg",
+    "name": "leela",
+    "email": "eedupugantil@gm.com",
+    "passwordHash": "734e9fd304c6f5eb1ab7ac533bc2335750548eaba9144a1441aeb65c58d10d47e565a3810fbec8138fdaeec3593a93e345a7a8118f1d353a9197cdc272261d24",
+    "salt": "6e5062795891416c34b69708fbab3be4",
+    "role": "student",
+    "token": "3af6dfd293b2fd74cd9fac60db2b9ccc36fb2b5b733bc3db7e0339dbc2a3fe55"
   }
 ]
