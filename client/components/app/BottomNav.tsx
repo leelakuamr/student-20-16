@@ -1,11 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, MessageCircle, Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 export function BottomNav() {
   const location = useLocation();
+  const { user } = useAuth();
+  const home = user?.role === "admin"
+    ? "/admin"
+    : user?.role === "instructor"
+    ? "/instructor"
+    : user?.role === "parent"
+    ? "/parent"
+    : "/dashboard";
   const items = [
-    { to: "/dashboard", label: "Home", icon: Home },
+    { to: home, label: "Home", icon: Home },
     { to: "/discussions", label: "Discussions", icon: MessageCircle },
     { to: "/calendar", label: "Calendar", icon: Calendar },
     { to: "/profile", label: "Profile", icon: User },
