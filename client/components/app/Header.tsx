@@ -16,6 +16,7 @@ const navItems = [
 export function Header() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-background/70">
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
@@ -117,9 +118,17 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
-            <span className="text-sm text-muted-foreground">
-              {/* placeholder for role */}
-            </span>
+            {user?.role && (
+              <span className="rounded-full border px-2 py-0.5 text-xs">
+                {user.role === "admin"
+                  ? "Admin"
+                  : user.role === "instructor"
+                    ? "Instructor / Teacher"
+                    : user.role === "parent"
+                      ? "Parent / Guardian"
+                      : "Student"}
+              </span>
+            )}
           </div>
           <AuthControls />
         </div>
@@ -229,15 +238,9 @@ function AuthControls() {
       <div className="flex items-center gap-2">
         <Link
           to="/login"
-          className="text-sm text-foreground/80 hover:underline"
-        >
-          Sign In
-        </Link>
-        <Link
-          to="/register"
           className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
         >
-          Sign Up
+          Login
         </Link>
       </div>
     );

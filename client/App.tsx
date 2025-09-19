@@ -15,6 +15,7 @@ import Parent from "./pages/Parent";
 import Discussions from "./pages/Discussions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Auth from "./pages/Auth";
 import StudyGroups from "./pages/StudyGroups";
 import Gamification from "./pages/Gamification";
 import CalendarPage from "./pages/Calendar";
@@ -23,6 +24,7 @@ import AdminTeachersPage from "./pages/AdminTeachers";
 import ProfilePage from "./pages/Profile";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
+import { ProtectedRoute } from "./components/app/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -36,12 +38,41 @@ const App = () => (
           <Layout>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/instructor" element={<Instructor />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/parent" element={<Parent />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/instructor"
+                element={
+                  <ProtectedRoute roles={["instructor", "admin"]}>
+                    <Instructor />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute roles={["admin"]}>
+                    <Admin />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/parent"
+                element={
+                  <ProtectedRoute roles={["parent", "admin"]}>
+                    <Parent />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/discussions" element={<Discussions />} />
               <Route path="/study-groups" element={<StudyGroups />} />
               <Route path="/gamification" element={<Gamification />} />
@@ -50,7 +81,14 @@ const App = () => (
                 path="/contact-teachers"
                 element={<ContactTeachersPage />}
               />
-              <Route path="/admin/teachers" element={<AdminTeachersPage />} />
+              <Route
+                path="/admin/teachers"
+                element={
+                  <ProtectedRoute roles={["admin"]}>
+                    <AdminTeachersPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/profile" element={<ProfilePage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

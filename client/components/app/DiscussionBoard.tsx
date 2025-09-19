@@ -8,6 +8,19 @@ export function DiscussionBoard() {
   const [loading, setLoading] = useState(false);
   const maxLen = 500;
 
+  const remove = async (id: string) => {
+    const ok = window.confirm("Delete this post?");
+    if (!ok) return;
+    try {
+      const res = await fetch(`/api/discussions/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== id));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -64,7 +77,10 @@ export function DiscussionBoard() {
   return (
     <div className="space-y-4">
       <div className="rounded-lg border p-4">
-        <label htmlFor="discussion-input" className="mb-2 block text-sm font-medium">
+        <label
+          htmlFor="discussion-input"
+          className="mb-2 block text-sm font-medium"
+        >
           Share with your peers
         </label>
         <textarea
@@ -80,7 +96,9 @@ export function DiscussionBoard() {
         {/* controls: on md+ show inline, on mobile stack */}
         <div className="mt-2 text-xs text-muted-foreground">
           <div className="hidden items-center justify-between md:flex">
-            <span>{content.length}/{maxLen}</span>
+            <span>
+              {content.length}/{maxLen}
+            </span>
             <button
               className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               onClick={submit}
@@ -92,8 +110,13 @@ export function DiscussionBoard() {
 
           <div className="flex flex-col gap-2 md:hidden">
             <div className="flex items-center justify-between">
-              <span>{content.length}/{maxLen}</span>
-              <span className="text-rose-500 text-xs" aria-hidden={content.length <= maxLen} />
+              <span>
+                {content.length}/{maxLen}
+              </span>
+              <span
+                className="text-rose-500 text-xs"
+                aria-hidden={content.length <= maxLen}
+              />
             </div>
             <button
               className="w-full rounded-md bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
@@ -107,9 +130,15 @@ export function DiscussionBoard() {
       </div>
 
       <ul className="space-y-3">
-        {loading && <li className="text-sm text-muted-foreground">Loading discussions...</li>}
+        {loading && (
+          <li className="text-sm text-muted-foreground">
+            Loading discussions...
+          </li>
+        )}
         {!loading && posts.length === 0 && (
-          <li className="text-sm text-muted-foreground">No discussions yet — be the first to post.</li>
+          <li className="text-sm text-muted-foreground">
+            No discussions yet — be the first to post.
+          </li>
         )}
         {posts.map((p) => (
           <li key={p.id} className="rounded-lg border p-4">
@@ -121,8 +150,21 @@ export function DiscussionBoard() {
               </div>
               <div className="flex-1">
                 <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">{p.author}</span>
-                  <time dateTime={p.createdAt}>{new Date(p.createdAt).toLocaleString()}</time>
+                  <span className="font-medium text-foreground">
+                    {p.author}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <time dateTime={p.createdAt}>
+                      {new Date(p.createdAt).toLocaleString()}
+                    </time>
+                    <button
+                      className="text-rose-600 hover:underline disabled:opacity-50"
+                      aria-label="Delete post"
+                      onClick={() => remove(p.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
                 <p className="whitespace-pre-wrap">{p.content}</p>
               </div>
