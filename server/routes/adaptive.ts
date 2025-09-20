@@ -14,7 +14,15 @@ async function getDecoded(req: any) {
 export const logEngagement: RequestHandler = async (req, res) => {
   const decoded = await getDecoded(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
-  const { eventType, course, topicId, moduleId, durationSec, score, difficulty } = req.body as {
+  const {
+    eventType,
+    course,
+    topicId,
+    moduleId,
+    durationSec,
+    score,
+    difficulty,
+  } = req.body as {
     eventType: string;
     course?: string;
     topicId?: string;
@@ -50,8 +58,18 @@ export const predictPerformance: RequestHandler = async (req, res) => {
   const db = getFirestore();
   const [progressSnap, engageSnap, subsSnap] = await Promise.all([
     db.collection("progress").where("userId", "==", decoded.uid).get(),
-    db.collection("engagement").where("userId", "==", decoded.uid).orderBy("createdAt", "desc").limit(200).get(),
-    db.collection("submissions").where("userId", "==", decoded.uid).orderBy("submittedAt", "desc").limit(50).get(),
+    db
+      .collection("engagement")
+      .where("userId", "==", decoded.uid)
+      .orderBy("createdAt", "desc")
+      .limit(200)
+      .get(),
+    db
+      .collection("submissions")
+      .where("userId", "==", decoded.uid)
+      .orderBy("submittedAt", "desc")
+      .limit(50)
+      .get(),
   ]);
 
   const progress = progressSnap.docs.map((d) => d.data() as any);
@@ -59,26 +77,34 @@ export const predictPerformance: RequestHandler = async (req, res) => {
   const engagement = engageSnap.docs.map((d) => d.data() as any);
 
   const completion = progress.length
-    ? progress.reduce((s, p) => s + (Number(p.value) || 0), 0) / (progress.length * 100)
+    ? progress.reduce((s, p) => s + (Number(p.value) || 0), 0) /
+      (progress.length * 100)
     : 0.5;
 
   const watchTime = engagement
     .filter((e) => e.eventType === "video_watch")
     .reduce((s, e) => s + (Number(e.durationSec) || 0), 0);
-  const practiceCount = engagement.filter((e) => e.eventType === "practice").length;
-  const engagementScore = Math.min(1, watchTime / 3600) * 0.6 + Math.min(1, practiceCount / 20) * 0.4; // 1h video + 20 practices => 1.0
+  const practiceCount = engagement.filter(
+    (e) => e.eventType === "practice",
+  ).length;
+  const engagementScore =
+    Math.min(1, watchTime / 3600) * 0.6 + Math.min(1, practiceCount / 20) * 0.4; // 1h video + 20 practices => 1.0
 
   const recentGrades = submissions
     .map((s) => Number(s.grade))
     .filter((g) => !Number.isNaN(g));
   const grade = recentGrades.length
-    ? recentGrades.slice(0, 5).reduce((a, b) => a + b, 0) / (recentGrades.slice(0, 5).length * 100)
+    ? recentGrades.slice(0, 5).reduce((a, b) => a + b, 0) /
+      (recentGrades.slice(0, 5).length * 100)
     : 0.5;
 
   const z = -0.5 + 1.6 * completion + 0.9 * engagementScore + 0.7 * grade;
   const probability = Math.max(0, Math.min(1, sigmoid(z)));
 
-  res.json({ probability, factors: { completion, engagement: engagementScore, grade } });
+  res.json({
+    probability,
+    factors: { completion, engagement: engagementScore, grade },
+  });
 };
 
 export const getNextDifficulty: RequestHandler = async (req, res) => {
@@ -106,12 +132,28 @@ export const getNextDifficulty: RequestHandler = async (req, res) => {
 export const submitLearningStyle: RequestHandler = async (req, res) => {
   const decoded = await getDecoded(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
-  const { scores } = req.body as { scores: { V: number; A: number; R: number; K: number } };
+  const { scores } = req.body as {
+    scores: { V: number; A: number; R: number; K: number };
+  };
   if (!scores) return res.status(400).json({ error: "scores required" });
-  const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0] as "V" | "A" | "R" | "K";
-  const labelMap: Record<string, string> = { V: "visual", A: "auditory", R: "read_write", K: "kinesthetic" };
+  const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0] as
+    | "V"
+    | "A"
+    | "R"
+    | "K";
+  const labelMap: Record<string, string> = {
+    V: "visual",
+    A: "auditory",
+    R: "read_write",
+    K: "kinesthetic",
+  };
   const db = getFirestore();
-  await db.doc(`users/${decoded.uid}`).set({ learningStyle: { dominant: labelMap[best], scores } }, { merge: true });
+  await db
+    .doc(`users/${decoded.uid}`)
+    .set(
+      { learningStyle: { dominant: labelMap[best], scores } },
+      { merge: true },
+    );
   res.json({ ok: true, learningStyle: { dominant: labelMap[best], scores } });
 };
 
@@ -120,6 +162,7 @@ export const getLearningStyle: RequestHandler = async (req, res) => {
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
   const db = getFirestore();
   const snap = await db.doc(`users/${decoded.uid}`).get();
-  const data = (snap.exists ? (snap.data() as any).learningStyle : null) || null;
+  const data =
+    (snap.exists ? (snap.data() as any).learningStyle : null) || null;
   res.json({ learningStyle: data });
 };

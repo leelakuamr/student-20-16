@@ -8,10 +8,7 @@ function genId(prefix = "id") {
 }
 
 async function getAuthedUser(req: any) {
-  const authHeader = (req.headers.authorization || "").replace(
-    "Bearer ",
-    "",
-  );
+  const authHeader = (req.headers.authorization || "").replace("Bearer ", "");
   if (!authHeader) return null;
   try {
     const decoded = await verifyIdToken(authHeader);
@@ -67,7 +64,12 @@ export const handleGetRecommendations: RequestHandler = async (req, res) => {
 
   const [progressSnap, engageSnap] = await Promise.all([
     db.collection("progress").where("userId", "==", decoded.uid).get(),
-    db.collection("engagement").where("userId", "==", decoded.uid).orderBy("createdAt", "desc").limit(200).get(),
+    db
+      .collection("engagement")
+      .where("userId", "==", decoded.uid)
+      .orderBy("createdAt", "desc")
+      .limit(200)
+      .get(),
   ]);
 
   const progress = progressSnap.docs.map((d) => d.data() as any);
@@ -79,7 +81,9 @@ export const handleGetRecommendations: RequestHandler = async (req, res) => {
     .slice(0, 3);
 
   const watchedCourses = new Set(
-    engagement.filter((e) => e.eventType === "video_watch" && e.course).map((e) => e.course as string),
+    engagement
+      .filter((e) => e.eventType === "video_watch" && e.course)
+      .map((e) => e.course as string),
   );
 
   const items: { id: string; title: string; reason: string }[] = [];
@@ -91,7 +95,11 @@ export const handleGetRecommendations: RequestHandler = async (req, res) => {
   }
 
   if (items.length === 0) {
-    items.push({ id: "rec_review", title: "Review recent topics", reason: "Keep momentum with spaced repetition" });
+    items.push({
+      id: "rec_review",
+      title: "Review recent topics",
+      reason: "Keep momentum with spaced repetition",
+    });
   }
 
   res.json({ items });
@@ -175,7 +183,8 @@ export const handleDeleteDiscussion: RequestHandler = async (req, res) => {
   if (!snap.exists) return res.status(404).json({ error: "Not found" });
   const data = snap.data() as any;
   const isOwner = data.authorId === decoded.uid;
-  const isAdmin = (await db.doc(`users/${decoded.uid}`).get()).data()?.role === "admin";
+  const isAdmin =
+    (await db.doc(`users/${decoded.uid}`).get()).data()?.role === "admin";
   if (!isOwner && !isAdmin) return res.status(403).json({ error: "Forbidden" });
   await docRef.delete();
   return res.json({ ok: true });
@@ -206,7 +215,9 @@ export const handleCourseDiscussions: RequestHandler = async (req, res) => {
       content: content.trim(),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     } as any;
-    const ref = await db.collection(`courses/${courseId}/discussions`).add(post);
+    const ref = await db
+      .collection(`courses/${courseId}/discussions`)
+      .add(post);
     const saved = { id: ref.id, ...post, createdAt: new Date().toISOString() };
 
     const payload = `data: ${JSON.stringify({ post: saved })}\n\n`;
@@ -274,7 +285,8 @@ export const handleDeleteCourseDiscussion: RequestHandler = async (
   if (!snap.exists) return res.status(404).json({ error: "Not found" });
   const data = snap.data() as any;
   const isOwner = data.authorId === decoded.uid;
-  const isAdmin = (await db.doc(`users/${decoded.uid}`).get()).data()?.role === "admin";
+  const isAdmin =
+    (await db.doc(`users/${decoded.uid}`).get()).data()?.role === "admin";
   if (!isOwner && !isAdmin) return res.status(403).json({ error: "Forbidden" });
   await ref.delete();
   return res.json({ ok: true });
@@ -291,7 +303,10 @@ export const handleAssignments: RequestHandler = async (req, res) => {
       .orderBy("submittedAt", "desc")
       .limit(50)
       .get();
-    const submissions = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const submissions = snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() as any),
+    }));
     return res.json({ submissions });
   }
   if (req.method === "POST") {
@@ -308,7 +323,10 @@ export const handleAssignments: RequestHandler = async (req, res) => {
 
     if (contentBase64) {
       const buffer = Buffer.from(contentBase64, "base64");
-      const safeName = (filename || `upload-${Date.now()}`).replace(/[^a-zA-Z0-9_.-]/g, "_");
+      const safeName = (filename || `upload-${Date.now()}`).replace(
+        /[^a-zA-Z0-9_.-]/g,
+        "_",
+      );
       const objectPath = `assignments/${decoded.uid}/${id}_${safeName}`;
       const file = bucket.file(objectPath);
       await file.save(buffer, {
@@ -316,7 +334,10 @@ export const handleAssignments: RequestHandler = async (req, res) => {
         metadata: { contentType: "application/octet-stream" },
       });
       storedPath = objectPath;
-      const [url] = await file.getSignedUrl({ action: "read", expires: Date.now() + 7 * 24 * 60 * 60 * 1000 });
+      const [url] = await file.getSignedUrl({
+        action: "read",
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      });
       downloadUrl = url;
     } else if (note) {
       const objectPath = `assignments/${decoded.uid}/${id}_note.txt`;
@@ -326,7 +347,10 @@ export const handleAssignments: RequestHandler = async (req, res) => {
         metadata: { contentType: "text/plain; charset=utf-8" },
       });
       storedPath = objectPath;
-      const [url] = await file.getSignedUrl({ action: "read", expires: Date.now() + 7 * 24 * 60 * 60 * 1000 });
+      const [url] = await file.getSignedUrl({
+        action: "read",
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      });
       downloadUrl = url;
     }
 
@@ -341,7 +365,11 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     } as any;
 
     const ref = await db.collection("submissions").add(submission);
-    const saved = { id: ref.id, ...submission, submittedAt: new Date().toISOString() };
+    const saved = {
+      id: ref.id,
+      ...submission,
+      submittedAt: new Date().toISOString(),
+    };
     return res.status(201).json({ submission: saved });
   }
   res.status(405).end();

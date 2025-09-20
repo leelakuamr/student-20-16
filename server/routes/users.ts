@@ -2,10 +2,7 @@ import { RequestHandler } from "express";
 import { getFirestore, verifyIdToken, getAuth } from "../firebase";
 
 async function getDecoded(req: any) {
-  const authHeader = (req.headers.authorization || "").replace(
-    "Bearer ",
-    "",
-  );
+  const authHeader = (req.headers.authorization || "").replace("Bearer ", "");
   if (!authHeader) return null;
   try {
     return (await verifyIdToken(authHeader)) as any;
@@ -31,17 +28,26 @@ export const deleteMe: RequestHandler = async (req, res) => {
   // Best-effort delete related data
   const batches: FirebaseFirestore.WriteBatch[] = [];
   const b1 = db.batch();
-  const subs = await db.collection("submissions").where("userId", "==", uid).get();
+  const subs = await db
+    .collection("submissions")
+    .where("userId", "==", uid)
+    .get();
   subs.docs.forEach((d) => b1.delete(d.ref));
   batches.push(b1);
 
   const b2 = db.batch();
-  const progress = await db.collection("progress").where("userId", "==", uid).get();
+  const progress = await db
+    .collection("progress")
+    .where("userId", "==", uid)
+    .get();
   progress.docs.forEach((d) => b2.delete(d.ref));
   batches.push(b2);
 
   const b3 = db.batch();
-  const discussions = await db.collection("discussions").where("authorId", "==", uid).get();
+  const discussions = await db
+    .collection("discussions")
+    .where("authorId", "==", uid)
+    .get();
   discussions.docs.forEach((d) => b3.delete(d.ref));
   batches.push(b3);
 
@@ -49,7 +55,10 @@ export const deleteMe: RequestHandler = async (req, res) => {
   for (const b of batches) await b.commit();
 
   // Delete user profile
-  await db.doc(`users/${uid}`).delete().catch(() => {});
+  await db
+    .doc(`users/${uid}`)
+    .delete()
+    .catch(() => {});
 
   // Optionally disable Firebase Auth user
   try {
@@ -72,20 +81,29 @@ export const deleteUserById: RequestHandler = async (req, res) => {
   // Best-effort deletions
   const batches: FirebaseFirestore.WriteBatch[] = [];
   const b1 = db.batch();
-  (await db.collection("submissions").where("userId", "==", id).get()).docs.forEach((d) => b1.delete(d.ref));
+  (
+    await db.collection("submissions").where("userId", "==", id).get()
+  ).docs.forEach((d) => b1.delete(d.ref));
   batches.push(b1);
 
   const b2 = db.batch();
-  (await db.collection("progress").where("userId", "==", id).get()).docs.forEach((d) => b2.delete(d.ref));
+  (
+    await db.collection("progress").where("userId", "==", id).get()
+  ).docs.forEach((d) => b2.delete(d.ref));
   batches.push(b2);
 
   const b3 = db.batch();
-  (await db.collection("discussions").where("authorId", "==", id).get()).docs.forEach((d) => b3.delete(d.ref));
+  (
+    await db.collection("discussions").where("authorId", "==", id).get()
+  ).docs.forEach((d) => b3.delete(d.ref));
   batches.push(b3);
 
   for (const b of batches) await b.commit();
 
-  await db.doc(`users/${id}`).delete().catch(() => {});
+  await db
+    .doc(`users/${id}`)
+    .delete()
+    .catch(() => {});
   try {
     await getAuth().deleteUser(id as any);
   } catch {}
@@ -113,7 +131,9 @@ export const updateMe: RequestHandler = async (req, res) => {
   };
 
   if (password) {
-    return res.status(501).json({ error: "Password update not supported here" });
+    return res
+      .status(501)
+      .json({ error: "Password update not supported here" });
   }
 
   const db = getFirestore();

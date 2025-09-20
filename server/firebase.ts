@@ -83,7 +83,10 @@ export async function listUsers(maxResults = 1000) {
   return list;
 }
 
-export async function setCustomClaims(uid: string, claims: Record<string, any>) {
+export async function setCustomClaims(
+  uid: string,
+  claims: Record<string, any>,
+) {
   ensureInitialized();
   await admin.auth().setCustomUserClaims(uid, claims);
 }
