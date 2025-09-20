@@ -1,12 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
-import fs from "fs/promises";
+import { promises as fsp } from "fs";
 
 const dataDir = path.resolve(__dirname, "../data");
 
 async function ensureDataDir() {
   try {
-    await fs.mkdir(dataDir, { recursive: true });
+    await fsp.mkdir(dataDir, { recursive: true });
   } catch (e) {
     // ignore
   }
@@ -16,7 +16,7 @@ export async function readJSON<T>(filename: string, fallback: T): Promise<T> {
   await ensureDataDir();
   const p = path.join(dataDir, filename);
   try {
-    const raw = await fs.readFile(p, "utf-8");
+    const raw = await fsp.readFile(p, "utf-8");
     return JSON.parse(raw) as T;
   } catch (e) {
     await writeJSON(filename, fallback);
@@ -27,5 +27,5 @@ export async function readJSON<T>(filename: string, fallback: T): Promise<T> {
 export async function writeJSON<T>(filename: string, data: T) {
   await ensureDataDir();
   const p = path.join(dataDir, filename);
-  await fs.writeFile(p, JSON.stringify(data, null, 2), "utf-8");
+  await fsp.writeFile(p, JSON.stringify(data, null, 2), "utf-8");
 }
