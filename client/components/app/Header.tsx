@@ -10,6 +10,7 @@ const navItems = [
   { to: "/home", label: "Dashboard" },
   { to: "/instructor", label: "Instructor" },
   { to: "/admin", label: "Admin" },
+  { to: "/admin-panel", label: "Admin Panel" },
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
 ] as const;
