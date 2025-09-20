@@ -38,6 +38,13 @@ export default function RequestInstructor() {
         requestedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      try {
+        await fetch("/api/notify/instructor-request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid: user.id, name: user.name, email: user.email }),
+        });
+      } catch {}
     } finally {
       await refresh();
     }
