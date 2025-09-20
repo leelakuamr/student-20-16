@@ -56,6 +56,8 @@ export function createServer() {
     edu.handleDeleteCourseDiscussion,
   );
   app.all("/api/assignments", edu.handleAssignments);
+  app.get("/api/instructor/submissions", edu.handleInstructorSubmissions);
+  app.post("/api/submissions/:id/grade", edu.handleGradeSubmission);
 
   // Courses
   app.get("/api/courses", courses.listCourses);
