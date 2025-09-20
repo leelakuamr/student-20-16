@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Instructor from "./pages/Instructor";
 import Admin from "./pages/Admin";
 import Parent from "./pages/Parent";
+import AdminPanel from "./pages/AdminPanel";
 import Discussions from "./pages/Discussions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -64,6 +65,14 @@ const App = () => (
                 element={
                   <ProtectedRoute roles={["admin"]}>
                     <Admin />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-panel"
+                element={
+                  <ProtectedRoute roles={["admin"]}>
+                    <AdminPanel />
                   </ProtectedRoute>
                 }
               />
