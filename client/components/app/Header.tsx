@@ -62,6 +62,7 @@ export function Header() {
               if (item.to === "/parent")
                 return role === "parent" || role === "admin";
               if (item.to === "/home") return !!user; // any authenticated user
+              if (item.to === "/contact-teachers") return user?.role === "student";
               return true; // public
             })
             .map((item) => (
@@ -189,6 +190,7 @@ export function Header() {
                   if (item.to === "/parent")
                     return role === "parent" || role === "admin";
                   if (item.to === "/home") return !!user;
+                  if (item.to === "/contact-teachers") return user?.role === "student";
                   return true;
                 })
                 .map((it) => (

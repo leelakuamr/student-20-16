@@ -10,6 +10,7 @@ import * as usersRoutes from "./routes/users";
 import * as adminRoutes from "./routes/admin";
 import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
+import * as courses from "./routes/courses";
 // Firebase Admin not initialized; client handles auth
 
 export function createServer() {
@@ -38,6 +39,10 @@ export function createServer() {
   app.delete("/api/discussions/:id", edu.handleDeleteDiscussion);
   app.get("/api/discussions/stream", edu.handleDiscussionStream);
   app.all("/api/assignments", edu.handleAssignments);
+
+  // Courses
+  app.get("/api/courses", courses.listCourses);
+  app.post("/api/courses", courses.createCourse);
 
   // Chat
   app.get("/api/chat", chatRoutes.getMessages);
@@ -72,6 +77,7 @@ export function createServer() {
   app.get("/api/teachers", contactRoutes.listTeachers);
   app.post("/api/teachers", contactRoutes.createTeacher);
   app.post("/api/contact-teacher", contactRoutes.sendMessageToTeacher);
+  app.post("/api/contact-student", contactRoutes.sendMessageToStudent);
   app.get("/api/messages", contactRoutes.listMessages);
 
   // error handler

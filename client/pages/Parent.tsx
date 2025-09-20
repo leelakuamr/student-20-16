@@ -120,7 +120,7 @@ export default function Parent() {
             <div className="rounded-lg border overflow-hidden">
               <div className="border-b bg-muted/50 p-3 text-sm font-medium">
                 Latest Updates
-          </div>
+              </div>
               <ul className="divide-y">
                 {recentActivity.map((activity) => (
                   <li key={activity.id} className="p-4">
@@ -130,14 +130,14 @@ export default function Parent() {
                           activity.type === 'assignment' ? 'bg-blue-100' : 'bg-green-100'
                         }`}>
                           {activity.type === 'assignment' ? '📝' : '🏆'}
-            </div>
+                        </div>
                         <div>
                           <div className="font-medium">{activity.title}</div>
                           <div className="text-sm text-muted-foreground">
                             {activity.subject} • {activity.date}
-            </div>
-          </div>
-        </div>
+                          </div>
+                        </div>
+                      </div>
                       {activity.grade && (
                         <span className={`font-semibold ${
                           activity.grade.startsWith('A') ? 'text-green-600' : 
@@ -147,10 +147,10 @@ export default function Parent() {
                         </span>
                       )}
                     </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
 
           {/* Teacher Communication */}
@@ -217,8 +217,8 @@ export default function Parent() {
                   <span className="text-sm text-muted-foreground">No school</span>
                 </div>
               </div>
-          </div>
-      </section>
+            </div>
+          </section>
         </>
       )}
     </div>

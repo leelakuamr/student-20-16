@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { getAuth, getFirestore } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { toast as notify } from "sonner";
 
 type Mode = "login" | "register";
 
@@ -37,13 +38,16 @@ export default function Auth({
     try {
       if (mode === "login") {
         await login(email, password, remember);
+        notify("Signed in successfully");
       } else {
         await register(name, email, password, role, remember);
+        notify("Account created");
       }
       // Redirect to role-based home page
       nav("/home");
     } catch (e) {
       setErr(mode === "login" ? "Login failed" : "Registration failed");
+      notify.error(mode === "login" ? "Login failed" : "Registration failed");
     }
   }
 
