@@ -365,8 +365,12 @@ export const handleAssignments: RequestHandler = async (req, res) => {
       downloadUrl = url;
     }
 
+    const userSnap = await db.doc(`users/${decoded.uid}`).get();
+    const userName = (userSnap.data() as any)?.name || decoded.email || "";
+
     const submission = {
       userId: decoded.uid,
+      userName,
       filename: filename ?? `notes-${Date.now()}.txt`,
       submittedAt: admin.firestore.FieldValue.serverTimestamp(),
       status: "submitted",
