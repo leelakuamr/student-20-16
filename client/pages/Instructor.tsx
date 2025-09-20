@@ -1,8 +1,53 @@
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ContactStudents } from "@/components/app/ContactStudents";
+
 export default function Instructor() {
-  const courses = [
-    { id: "c1", title: "Algebra I", students: 28, assignments: 12 },
-    { id: "c2", title: "Chemistry Basics", students: 24, assignments: 10 },
-  ];
+  const [courses, setCourses] = useState<
+    { id: string; title: string; students: number; assignments: number }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("");
+  const [students, setStudents] = useState(0);
+  const [assignments, setAssignments] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/courses");
+        if (res.ok) {
+          const data = await res.json();
+          setCourses(data.courses || []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  async function addCourse(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim()) return;
+    const res = await fetch("/api/courses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, students, assignments }),
+    });
+    if (res.ok) {
+      const d = await res.json();
+      setCourses((prev) => [d.course, ...prev]);
+      setTitle("");
+      setStudents(0);
+      setAssignments(0);
+    }
+  }
+
   const submissions = [
     {
       id: "s1",
@@ -25,10 +70,92 @@ export default function Instructor() {
       </p>
 
       <section className="mt-6">
-        <h2 className="text-lg font-semibold">Your Courses</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Your Courses</h2>
+          <div className="flex items-center gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="rounded-md border px-3 py-1.5 text-sm">
+                  Contact Students
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                  <DialogTitle>Contact a student</DialogTitle>
+                </DialogHeader>
+                <ContactStudents />
+              </DialogContent>
+            </Dialog>
+            <form
+              onSubmit={addCourse}
+              className="hidden md:flex items-center gap-2"
+            >
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Course title"
+                className="w-56 rounded-md border px-2 py-1 text-sm"
+              />
+              <input
+                type="number"
+                min={0}
+                value={students}
+                onChange={(e) => setStudents(Number(e.target.value))}
+                placeholder="# students"
+                className="w-28 rounded-md border px-2 py-1 text-sm"
+              />
+              <input
+                type="number"
+                min={0}
+                value={assignments}
+                onChange={(e) => setAssignments(Number(e.target.value))}
+                placeholder="# assignments"
+                className="w-32 rounded-md border px-2 py-1 text-sm"
+              />
+              <button className="rounded-md border px-3 py-1.5 text-sm">
+                Add
+              </button>
+            </form>
+          </div>
+        </div>
         <div className="mt-3">
+          {/* Mobile add form */}
+          <form
+            onSubmit={addCourse}
+            className="md:hidden mb-3 grid grid-cols-2 gap-2"
+          >
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Course title"
+              className="col-span-2 rounded-md border px-2 py-1 text-sm"
+            />
+            <input
+              type="number"
+              min={0}
+              value={students}
+              onChange={(e) => setStudents(Number(e.target.value))}
+              placeholder="Students"
+              className="rounded-md border px-2 py-1 text-sm"
+            />
+            <input
+              type="number"
+              min={0}
+              value={assignments}
+              onChange={(e) => setAssignments(Number(e.target.value))}
+              placeholder="Assignments"
+              className="rounded-md border px-2 py-1 text-sm"
+            />
+            <button className="col-span-2 rounded-md border px-3 py-1.5 text-sm">
+              Add
+            </button>
+          </form>
+
           {/* Mobile: cards */}
           <div className="md:hidden space-y-2">
+            {loading && (
+              <div className="text-sm text-muted-foreground">Loading…</div>
+            )}
             {courses.map((c) => (
               <div key={c.id} className="rounded-lg border p-3">
                 <div className="font-medium">{c.title}</div>
@@ -60,6 +187,13 @@ export default function Instructor() {
                 </tr>
               </thead>
               <tbody>
+                {loading && (
+                  <tr>
+                    <td className="p-3 text-muted-foreground" colSpan={3}>
+                      Loading…
+                    </td>
+                  </tr>
+                )}
                 {courses.map((c) => (
                   <tr key={c.id} className="border-t">
                     <td className="p-3">{c.title}</td>

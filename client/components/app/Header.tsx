@@ -1,5 +1,6 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
@@ -13,6 +14,39 @@ const navItems = [
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
 ] as const;
+
+function RoleBadge({ role }: { role: string }) {
+  const label =
+    role === "admin"
+      ? "Admin"
+      : role === "instructor"
+        ? "Instructor"
+        : role === "parent"
+          ? "Parent"
+          : "Student";
+  const isParent = role === "parent";
+  const variant: any =
+    role === "admin"
+      ? "destructive"
+      : role === "student"
+        ? "default"
+        : role === "instructor"
+          ? "secondary"
+          : "default";
+  return (
+    <Badge
+      variant={variant}
+      className={
+        "rounded-full px-3 py-1 text-xs" +
+        (isParent
+          ? " border-transparent bg-accent text-accent-foreground hover:bg-accent/80"
+          : "")
+      }
+    >
+      {label}
+    </Badge>
+  );
+}
 
 export function Header() {
   const location = useLocation();
@@ -61,7 +95,9 @@ export function Header() {
                 return role === "instructor" || role === "admin";
               if (item.to === "/parent")
                 return role === "parent" || role === "admin";
-              if (item.to === "/dashboard") return !!user; // any authenticated user
+              if (item.to === "/dashboard") return user?.role === "student";
+              if (item.to === "/contact-teachers")
+                return user?.role === "student";
               return true; // public
             })
             .map((item) => (
@@ -159,17 +195,7 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
-            {user?.role && (
-              <span className="rounded-full border px-2 py-0.5 text-xs">
-                {user.role === "admin"
-                  ? "Admin"
-                  : user.role === "instructor"
-                    ? "Instructor / Teacher"
-                    : user.role === "parent"
-                      ? "Parent / Guardian"
-                      : "Student"}
-              </span>
-            )}
+            {user?.role && <RoleBadge role={user.role} />}
           </div>
           <AuthControls />
         </div>
@@ -188,7 +214,9 @@ export function Header() {
                     return role === "instructor" || role === "admin";
                   if (item.to === "/parent")
                     return role === "parent" || role === "admin";
-                  if (item.to === "/dashboard") return !!user;
+                  if (item.to === "/dashboard") return user?.role === "student";
+                  if (item.to === "/contact-teachers")
+                    return user?.role === "student";
                   return true;
                 })
                 .map((it) => (

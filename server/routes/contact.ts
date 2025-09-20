@@ -99,3 +99,30 @@ export const listMessages: RequestHandler = async (_req, res) => {
   const messages = await readJSON("messages.json", [] as any[]);
   res.json({ messages });
 };
+
+export const sendMessageToStudent: RequestHandler = async (req, res) => {
+  const { studentId, subject, message, fromName, fromEmail } = req.body as {
+    studentId?: string;
+    subject?: string;
+    message?: string;
+    fromName?: string;
+    fromEmail?: string;
+  };
+  if (!message || !studentId)
+    return res.status(400).json({ error: "Missing fields" });
+
+  const messages = await readJSON("messages.json", [] as any[]);
+  const m = {
+    id: genId("msg"),
+    studentId,
+    subject: subject ?? "Message from instructor",
+    message,
+    fromName: fromName ?? "Instructor",
+    fromEmail: fromEmail ?? null,
+    createdAt: new Date().toISOString(),
+    read: false,
+  } as any;
+  messages.unshift(m);
+  await writeJSON("messages.json", messages);
+  res.status(201).json({ ok: true, message: m });
+};

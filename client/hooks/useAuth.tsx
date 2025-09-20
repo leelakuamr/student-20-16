@@ -17,6 +17,7 @@ type User = { id: string; name: string; role?: string } | null;
 type AuthContext = {
   user: User;
   token: string | null;
+  loading: boolean;
   login: (email: string, password: string, remember?: boolean) => Promise<void>;
   register: (
     name: string,
@@ -33,31 +34,42 @@ const ctx = createContext<AuthContext | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
     const db = getFirestore();
+    let unsubDoc: (() => void) | null = null;
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
+        if (unsubDoc) unsubDoc();
         setUser(null);
         setToken(null);
+        setLoading(false);
         return;
       }
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
-      let role: string | undefined = undefined;
-      try {
-        const snap = await getDoc(doc(db, "users", fbUser.uid));
-        role =
-          (snap.exists() ? (snap.data() as any).role : undefined) ?? undefined;
-      } catch {}
-      setUser({
-        id: fbUser.uid,
-        name: fbUser.displayName || fbUser.email || "",
-        role,
-      });
+      // Live-sync role and profile
+      if (unsubDoc) unsubDoc();
+      unsubDoc = (await import("firebase/firestore")).onSnapshot(
+        doc(db, "users", fbUser.uid),
+        (snap) => {
+          const data = snap.exists() ? (snap.data() as any) : {};
+          setUser({
+            id: fbUser.uid,
+            name: fbUser.displayName || fbUser.email || "",
+            role: data.role as string | undefined,
+          });
+          setLoading(false);
+        },
+        () => setLoading(false),
+      );
     });
-    return () => unsub();
+    return () => {
+      unsub();
+      if (unsubDoc) unsubDoc();
+    };
   }, []);
 
   async function login(email: string, password: string, remember = true) {
@@ -114,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ctx.Provider value={{ user, token, login, register, logout }}>
+    <ctx.Provider value={{ user, token, loading, login, register, logout }}>
       {children}
     </ctx.Provider>
   );

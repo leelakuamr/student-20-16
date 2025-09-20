@@ -27,6 +27,12 @@ export default function Index() {
               >
                 For Instructors
               </Link>
+              <Link
+                to="/parent"
+                className="rounded-md border px-5 py-3 hover:bg-accent hover:text-accent-foreground"
+              >
+                For Parents
+              </Link>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">
