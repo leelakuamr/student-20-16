@@ -11,6 +11,7 @@ const navItems = [
   { to: "/instructor", label: "Instructor" },
   { to: "/admin", label: "Admin" },
   { to: "/admin-panel", label: "Admin Panel" },
+  { to: "/request-instructor", label: "Become Instructor" },
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
 ] as const;
