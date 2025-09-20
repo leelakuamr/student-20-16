@@ -27,7 +27,7 @@ export default function Auth({
   const [name, setName] = useState("");
   const [role, setRole] = useState("student");
 
-  const emailValid = /.+@.+\..+/.test(email);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const passValid = password.length >= 6;
   const canSubmit =
     emailValid && passValid && (mode === "login" || name.trim().length > 0);
@@ -35,19 +35,33 @@ export default function Auth({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr("");
+    const emailClean = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailClean)) {
+      setErr("Please enter a valid email address (no spaces).");
+      return;
+    }
     try {
       if (mode === "login") {
-        await login(email, password, remember);
+        await login(emailClean, password, remember);
         notify("Signed in successfully");
       } else {
-        await register(name, email, password, role, remember);
+        await register(name.trim(), emailClean, password, role, remember);
         notify("Account created");
       }
-      // Redirect to role-based home page
       nav("/home");
-    } catch (e) {
-      setErr(mode === "login" ? "Login failed" : "Registration failed");
-      notify.error(mode === "login" ? "Login failed" : "Registration failed");
+    } catch (e: any) {
+      const code = e?.code || e?.message || "";
+      const friendly = /invalid-email/i.test(code)
+        ? "Invalid email address."
+        : /email-already-in-use/i.test(code)
+          ? "Email already in use. Try signing in."
+          : /weak-password/i.test(code)
+            ? "Password should be at least 6 characters."
+            : mode === "login"
+              ? "Login failed"
+              : "Registration failed";
+      setErr(friendly);
+      notify.error(friendly);
     }
   }
 

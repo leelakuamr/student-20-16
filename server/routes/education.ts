@@ -135,17 +135,18 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     return res.json({ submissions });
   }
   if (req.method === "POST") {
-    const { filename, contentBase64, note } = req.body as {
-      filename: string;
+    const { filename, contentBase64, note, status } = req.body as {
+      filename?: string;
       contentBase64?: string;
       note?: string;
+      status?: string;
     };
     const submissions = await readJSON("submissions.json", [] as any[]);
     const s: any = {
       id: genId("sub"),
       filename: filename ?? `notes-${Date.now()}.txt`,
       submittedAt: new Date().toISOString(),
-      status: "submitted",
+      status: status || "submitted",
       note: note ?? undefined,
     };
     // save file if provided
@@ -180,6 +181,73 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     submissions.unshift(s);
     await writeJSON("submissions.json", submissions);
     return res.status(201).json({ submission: s });
+  }
+  if (req.method === "PATCH" || req.method === "PUT") {
+    const { id, filename, contentBase64, note, status, grade } = req.body as {
+      id?: string;
+      filename?: string;
+      contentBase64?: string;
+      note?: string;
+      status?: string;
+      grade?: string | number | null;
+    };
+    if (!id) return res.status(400).json({ error: "id is required" });
+    const submissions = await readJSON("submissions.json", [] as any[]);
+    const idx = submissions.findIndex((x: any) => x.id === id);
+    if (idx === -1) return res.status(404).json({ error: "Not found" });
+    const current = submissions[idx];
+    if (filename) current.filename = filename;
+    if (typeof status === "string") current.status = status;
+    if (typeof note === "string") current.note = note;
+    if (grade !== undefined) current.grade = grade;
+    if (contentBase64 || note) {
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        const uploadsDir = path.resolve(__dirname, "../uploads");
+        await fs.mkdir(uploadsDir, { recursive: true });
+        let fileName: string;
+        if (contentBase64) {
+          const buffer = Buffer.from(contentBase64, "base64");
+          fileName = `${id}_${current.filename}`;
+          await fs.writeFile(path.join(uploadsDir, fileName), buffer);
+        } else {
+          fileName = `${id}_note.txt`;
+          await fs.writeFile(
+            path.join(uploadsDir, fileName),
+            note ?? "",
+            "utf-8",
+          );
+        }
+        current.path = `/uploads/${fileName}`;
+      } catch (e) {
+        console.error("update save error", e);
+      }
+    }
+    submissions[idx] = current;
+    await writeJSON("submissions.json", submissions);
+    return res.json({ submission: current });
+  }
+  if (req.method === "DELETE") {
+    const { id } = req.body as { id?: string };
+    if (!id) return res.status(400).json({ error: "id is required" });
+    const submissions = await readJSON("submissions.json", [] as any[]);
+    const idx = submissions.findIndex((x: any) => x.id === id);
+    if (idx === -1) return res.status(404).json({ error: "Not found" });
+    const removed = submissions.splice(idx, 1)[0];
+    try {
+      if (removed?.path) {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        const uploadsDir = path.resolve(__dirname, "../uploads");
+        const full = path.join(uploadsDir, path.basename(removed.path));
+        await fs.unlink(full).catch(() => {});
+      }
+    } catch (e) {
+      console.error("delete file error", e);
+    }
+    await writeJSON("submissions.json", submissions);
+    return res.json({ ok: true });
   }
   res.status(405).end();
 };
