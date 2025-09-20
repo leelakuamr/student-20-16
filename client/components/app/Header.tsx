@@ -65,6 +65,7 @@ export function Header() {
               if (item.to === "/parent")
                 return role === "parent" || role === "admin";
               if (item.to === "/home") return !!user; // any authenticated user
+              if (item.to === "/request-instructor") return !!user && role !== "instructor";
               if (item.to === "/contact-teachers") return user?.role === "student";
               return true; // public
             })
@@ -200,6 +201,7 @@ export function Header() {
                   if (item.to === "/parent")
                     return role === "parent" || role === "admin";
                   if (item.to === "/home") return !!user;
+                  if (item.to === "/request-instructor") return !!user && role !== "instructor";
                   if (item.to === "/contact-teachers") return user?.role === "student";
                   return true;
                 })
