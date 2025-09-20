@@ -117,6 +117,14 @@ export default function Dashboard() {
           <DiscussionBoard />
         </section>
 
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Course Discussions</h2>
+            <CourseSelector progress={progress} />
+          </div>
+          <CourseDiscussionsArea progress={progress} />
+        </section>
+
         <section className="space-y-3 rounded-xl border bg-white/60 p-6 shadow-sm dark:bg-background">
           <h2 className="text-lg font-semibold">Add-On Features</h2>
           <p className="text-sm text-muted-foreground">
