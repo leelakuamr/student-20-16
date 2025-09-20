@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 type Submission = { id: string; filename: string; submittedAt: string; status: "submitted" | "graded"; grade?: number };
 
 export function AssignmentForm() {
+  const { token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [note, setNote] = useState("");
@@ -26,7 +28,10 @@ export function AssignmentForm() {
 
     const res = await fetch("/api/assignments", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ filename: file?.name ?? `notes-${Date.now()}.txt`, contentBase64, note }),
     });
     if (res.ok) {
@@ -41,7 +46,11 @@ export function AssignmentForm() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/assignments");
+        const res = await fetch("/api/assignments", {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
         if (res.ok) {
           const data = (await res.json()) as { submissions: Submission[] };
           setSubmissions(data.submissions);
