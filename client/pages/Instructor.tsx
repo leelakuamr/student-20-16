@@ -1,28 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Instructor() {
+  const { token } = useAuth();
   const [courses, setCourses] = useState([
     { id: "c1", title: "Algebra I", students: 28, assignments: 12, description: "Introduction to algebraic concepts" },
     { id: "c2", title: "Chemistry Basics", students: 24, assignments: 10, description: "Fundamental chemistry principles" },
   ]);
-  const [submissions, setSubmissions] = useState([
-    {
-      id: "s1",
-      student: "Rohan",
-      assignment: "Quadratic HW",
-      status: "submitted",
-      grade: null,
-      submittedAt: "2024-01-15",
-    },
-    {
-      id: "s2",
-      student: "Aisha",
-      assignment: "Lab Report 1",
-      status: "graded",
-      grade: "A",
-      submittedAt: "2024-01-14",
-    },
-  ]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [newCourse, setNewCourse] = useState({ title: "", description: "" });
   const [editingCourse, setEditingCourse] = useState<string | null>(null);
@@ -47,10 +32,41 @@ export default function Instructor() {
     setEditingCourse(null);
   };
 
-  const gradeSubmission = (id: string, grade: string) => {
-    setSubmissions(submissions.map(s => 
-      s.id === id ? { ...s, status: "graded", grade } : s
-    ));
+  async function fetchSubmissions() {
+    try {
+      const res = await fetch("/api/instructor/submissions", {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSubmissions(data.submissions || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  useEffect(() => {
+    fetchSubmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  const gradeSubmission = async (id: string, grade: string) => {
+    try {
+      const res = await fetch(`/api/submissions/${id}/grade`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ grade }),
+      });
+      if (res.ok) {
+        setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, status: "graded", grade } : s)));
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -194,15 +210,15 @@ export default function Instructor() {
           <div className="md:hidden space-y-2">
             {submissions.map((s) => (
               <div key={s.id} className="rounded-lg border p-3">
-                <div className="font-medium">{s.student}</div>
-                <div className="mt-1 text-sm">{s.assignment}</div>
+                <div className="font-medium">{s.userName || s.student || "Student"}</div>
+                <div className="mt-1 text-sm">{s.filename || s.assignment}</div>
                 <div className="mt-2 flex items-center justify-between">
                   <span className={`rounded-full px-2 py-0.5 text-xs ${
                     s.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {s.status}
                   </span>
-                  {s.grade && (
+                  {s.grade != null && (
                     <span className="font-semibold text-green-600">Grade: {s.grade}</span>
                   )}
                 </div>
@@ -247,9 +263,9 @@ export default function Instructor() {
               <tbody>
                 {submissions.map((s) => (
                   <tr key={s.id} className="border-t">
-                    <td className="p-3 font-medium">{s.student}</td>
-                    <td className="p-3">{s.assignment}</td>
-                    <td className="p-3 text-muted-foreground">{s.submittedAt}</td>
+                    <td className="p-3 font-medium">{s.userName || s.student || "Student"}</td>
+                    <td className="p-3">{s.filename || s.assignment}</td>
+                    <td className="p-3 text-muted-foreground">{s.submittedAt?.seconds ? new Date(s.submittedAt.seconds * 1000).toLocaleString() : s.submittedAt}</td>
                     <td className="p-3">
                       <span className={`rounded-full px-2 py-0.5 text-xs ${
                         s.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -258,7 +274,7 @@ export default function Instructor() {
                       </span>
                     </td>
                     <td className="p-3">
-                      {s.grade ? (
+                      {s.grade != null ? (
                         <span className="font-semibold text-green-600">{s.grade}</span>
                       ) : (
                         <span className="text-muted-foreground">Pending</span>
