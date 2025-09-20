@@ -29,7 +29,12 @@ export const createCourse: RequestHandler = async (req, res) => {
   const s = Number.isFinite(Number(students)) ? Number(students) : 0;
   const a = Number.isFinite(Number(assignments)) ? Number(assignments) : 0;
   const courses = await readJSON<Course[]>("courses.json", []);
-  const course: Course = { id: genId(), title: title.trim(), students: s, assignments: a };
+  const course: Course = {
+    id: genId(),
+    title: title.trim(),
+    students: s,
+    assignments: a,
+  };
   courses.push(course);
   await writeJSON("courses.json", courses);
   res.status(201).json({ course });

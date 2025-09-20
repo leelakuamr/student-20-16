@@ -4,7 +4,8 @@ import { readJSON } from "../utils/db";
 async function loadPrismaReal() {
   try {
     const mod: any = await import("@prisma/client");
-    const PrismaClient = mod.PrismaClient || (mod.default && mod.default.PrismaClient);
+    const PrismaClient =
+      mod.PrismaClient || (mod.default && mod.default.PrismaClient);
     if (PrismaClient) {
       return new PrismaClient();
     }
@@ -21,7 +22,9 @@ function id() {
 // Very small in-memory shim to keep dev server running when Prisma client isn't generated
 function createPrismaShim() {
   const makeDeleteMany = () => async (_args?: any) => ({ count: 0 });
-  const makeCreate = (key: string) => async ({ data }: any) => ({ id: id(), ...data });
+  const makeCreate =
+    (key: string) =>
+    async ({ data }: any) => ({ id: id(), ...data });
   const makeFindMany = (_key: string) => async (_args?: any) => [] as any[];
 
   const shim: any = {
@@ -44,8 +47,15 @@ function createPrismaShim() {
       },
       deleteMany: makeDeleteMany(),
     },
-    groupMember: { create: makeCreate("groupMember"), deleteMany: makeDeleteMany() },
-    badge: { findMany: makeFindMany("badge"), create: makeCreate("badge"), deleteMany: makeDeleteMany() },
+    groupMember: {
+      create: makeCreate("groupMember"),
+      deleteMany: makeDeleteMany(),
+    },
+    badge: {
+      findMany: makeFindMany("badge"),
+      create: makeCreate("badge"),
+      deleteMany: makeDeleteMany(),
+    },
     submission: { deleteMany: makeDeleteMany() },
     chatMessage: { deleteMany: makeDeleteMany() },
     progressEntry: { deleteMany: makeDeleteMany() },
@@ -78,7 +88,7 @@ const proxy = new Proxy(
         return fn;
       };
     },
-  }
+  },
 );
 
 export default proxy as any;

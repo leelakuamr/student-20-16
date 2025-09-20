@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ContactTeachers } from "@/components/app/ContactTeachers";
 
 export default function Parent() {
@@ -54,25 +60,46 @@ export default function Parent() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold">Parent / Guardian</h1>
-      <p className="mt-1 text-muted-foreground">Monitor your child's progress and communicate with teachers.</p>
+      <p className="mt-1 text-muted-foreground">
+        Monitor your child's progress and communicate with teachers.
+      </p>
 
       <section className="mt-6 grid gap-6 md:grid-cols-3">
         <div className="rounded-xl border p-6 md:col-span-2">
-          <h2 className="text-lg font-semibold">{child.name} — Grade {child.grade}</h2>
+          <h2 className="text-lg font-semibold">
+            {child.name} — Grade {child.grade}
+          </h2>
           <div className="mt-3">
-            <div className="mb-1 text-sm text-muted-foreground">Overall Progress</div>
-            <div className="h-3 w-full rounded-full bg-muted">
-              <div className="h-3 rounded-full bg-primary" style={{ width: `${progress}%` }} />
+            <div className="mb-1 text-sm text-muted-foreground">
+              Overall Progress
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">{progress}% complete</div>
+            <div className="h-3 w-full rounded-full bg-muted">
+              <div
+                className="h-3 rounded-full bg-primary"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              {progress}% complete
+            </div>
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-lg border p-4">
               <p className="text-sm font-semibold">Today’s Learning</p>
               <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                <li>Assignments submitted today: <span className="text-foreground font-semibold">{todaysSubs.length}</span></li>
-                <li>Discussion posts today: <span className="text-foreground font-semibold">{todaysPosts.length}</span></li>
+                <li>
+                  Assignments submitted today:{" "}
+                  <span className="text-foreground font-semibold">
+                    {todaysSubs.length}
+                  </span>
+                </li>
+                <li>
+                  Discussion posts today:{" "}
+                  <span className="text-foreground font-semibold">
+                    {todaysPosts.length}
+                  </span>
+                </li>
               </ul>
             </div>
             <div className="rounded-lg border p-4">
@@ -81,7 +108,9 @@ export default function Parent() {
                 {courses.map((c) => (
                   <li key={c.id} className="flex justify-between">
                     <span className="text-foreground">{c.title}</span>
-                    <span>{c.students} students · {c.assignments} assignments</span>
+                    <span>
+                      {c.students} students · {c.assignments} assignments
+                    </span>
                   </li>
                 ))}
                 {courses.length === 0 && <li>No courses yet.</li>}
@@ -105,7 +134,9 @@ export default function Parent() {
             <p className="text-sm font-semibold">Contact Teachers</p>
             <Dialog>
               <DialogTrigger asChild>
-                <button className="mt-3 w-full rounded-md border px-3 py-2 hover:bg-accent">Start a Message</button>
+                <button className="mt-3 w-full rounded-md border px-3 py-2 hover:bg-accent">
+                  Start a Message
+                </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-xl">
                 <DialogHeader>

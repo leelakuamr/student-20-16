@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ContactStudents } from "@/components/app/ContactStudents";
 
 export default function Instructor() {
@@ -43,8 +49,18 @@ export default function Instructor() {
   }
 
   const submissions = [
-    { id: "s1", student: "Rohan", assignment: "Quadratic HW", status: "submitted" },
-    { id: "s2", student: "Aisha", assignment: "Lab Report 1", status: "graded" },
+    {
+      id: "s1",
+      student: "Rohan",
+      assignment: "Quadratic HW",
+      status: "submitted",
+    },
+    {
+      id: "s2",
+      student: "Aisha",
+      assignment: "Lab Report 1",
+      status: "graded",
+    },
   ];
   return (
     <div className="container mx-auto px-4 py-8">
@@ -59,7 +75,9 @@ export default function Instructor() {
           <div className="flex items-center gap-2">
             <Dialog>
               <DialogTrigger asChild>
-                <button className="rounded-md border px-3 py-1.5 text-sm">Contact Students</button>
+                <button className="rounded-md border px-3 py-1.5 text-sm">
+                  Contact Students
+                </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
@@ -68,36 +86,44 @@ export default function Instructor() {
                 <ContactStudents />
               </DialogContent>
             </Dialog>
-            <form onSubmit={addCourse} className="hidden md:flex items-center gap-2">
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Course title"
-              className="w-56 rounded-md border px-2 py-1 text-sm"
-            />
-            <input
-              type="number"
-              min={0}
-              value={students}
-              onChange={(e) => setStudents(Number(e.target.value))}
-              placeholder="# students"
-              className="w-28 rounded-md border px-2 py-1 text-sm"
-            />
-            <input
-              type="number"
-              min={0}
-              value={assignments}
-              onChange={(e) => setAssignments(Number(e.target.value))}
-              placeholder="# assignments"
-              className="w-32 rounded-md border px-2 py-1 text-sm"
-            />
-            <button className="rounded-md border px-3 py-1.5 text-sm">Add</button>
-          </form>
+            <form
+              onSubmit={addCourse}
+              className="hidden md:flex items-center gap-2"
+            >
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Course title"
+                className="w-56 rounded-md border px-2 py-1 text-sm"
+              />
+              <input
+                type="number"
+                min={0}
+                value={students}
+                onChange={(e) => setStudents(Number(e.target.value))}
+                placeholder="# students"
+                className="w-28 rounded-md border px-2 py-1 text-sm"
+              />
+              <input
+                type="number"
+                min={0}
+                value={assignments}
+                onChange={(e) => setAssignments(Number(e.target.value))}
+                placeholder="# assignments"
+                className="w-32 rounded-md border px-2 py-1 text-sm"
+              />
+              <button className="rounded-md border px-3 py-1.5 text-sm">
+                Add
+              </button>
+            </form>
           </div>
         </div>
         <div className="mt-3">
           {/* Mobile add form */}
-          <form onSubmit={addCourse} className="md:hidden mb-3 grid grid-cols-2 gap-2">
+          <form
+            onSubmit={addCourse}
+            className="md:hidden mb-3 grid grid-cols-2 gap-2"
+          >
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -120,21 +146,31 @@ export default function Instructor() {
               placeholder="Assignments"
               className="rounded-md border px-2 py-1 text-sm"
             />
-            <button className="col-span-2 rounded-md border px-3 py-1.5 text-sm">Add</button>
+            <button className="col-span-2 rounded-md border px-3 py-1.5 text-sm">
+              Add
+            </button>
           </form>
 
           {/* Mobile: cards */}
           <div className="md:hidden space-y-2">
-            {loading && <div className="text-sm text-muted-foreground">Loading…</div>}
+            {loading && (
+              <div className="text-sm text-muted-foreground">Loading…</div>
+            )}
             {courses.map((c) => (
               <div key={c.id} className="rounded-lg border p-3">
                 <div className="font-medium">{c.title}</div>
                 <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                   <div>
-                    <span className="font-semibold text-foreground">{c.students}</span> students
+                    <span className="font-semibold text-foreground">
+                      {c.students}
+                    </span>{" "}
+                    students
                   </div>
                   <div>
-                    <span className="font-semibold text-foreground">{c.assignments}</span> assignments
+                    <span className="font-semibold text-foreground">
+                      {c.assignments}
+                    </span>{" "}
+                    assignments
                   </div>
                 </div>
               </div>
@@ -153,7 +189,9 @@ export default function Instructor() {
               <tbody>
                 {loading && (
                   <tr>
-                    <td className="p-3 text-muted-foreground" colSpan={3}>Loading…</td>
+                    <td className="p-3 text-muted-foreground" colSpan={3}>
+                      Loading…
+                    </td>
                   </tr>
                 )}
                 {courses.map((c) => (
@@ -179,7 +217,9 @@ export default function Instructor() {
                 <div className="font-medium">{s.student}</div>
                 <div className="mt-1 text-sm">{s.assignment}</div>
                 <div className="mt-2">
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{s.status}</span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                    {s.status}
+                  </span>
                 </div>
               </div>
             ))}
@@ -200,7 +240,9 @@ export default function Instructor() {
                     <td className="p-3">{s.student}</td>
                     <td className="p-3">{s.assignment}</td>
                     <td className="p-3">
-                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{s.status}</span>
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                        {s.status}
+                      </span>
                     </td>
                   </tr>
                 ))}

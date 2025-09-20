@@ -31,11 +31,7 @@ export function ProtectedRoute({
   }
 
   const effectiveRole = user.role ?? "student";
-  if (
-    roles &&
-    effectiveRole !== "admin" &&
-    !roles.includes(effectiveRole)
-  ) {
+  if (roles && effectiveRole !== "admin" && !roles.includes(effectiveRole)) {
     const dest = homeFor(effectiveRole);
     if (dest === location.pathname) return <Navigate to="/" replace />;
     return <Navigate to={dest} replace />;

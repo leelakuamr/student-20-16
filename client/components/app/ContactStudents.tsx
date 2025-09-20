@@ -17,7 +17,9 @@ export function ContactStudents() {
         const res = await fetch("/api/users");
         if (res.ok) {
           const data = await res.json();
-          const list: Student[] = (data.users || []).filter((u: any) => (u.role || "student") === "student");
+          const list: Student[] = (data.users || []).filter(
+            (u: any) => (u.role || "student") === "student",
+          );
           setStudents(list);
           if (list.length > 0) setSelected(list[0].id);
         }
@@ -105,10 +107,15 @@ export function ContactStudents() {
         />
       </div>
       <div className="flex items-center gap-2">
-        <button onClick={send} className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground">
+        <button
+          onClick={send}
+          className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
+        >
           Send
         </button>
-        {status && <span className="text-sm text-muted-foreground">{status}</span>}
+        {status && (
+          <span className="text-sm text-muted-foreground">{status}</span>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,11 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAnalytics, type Analytics } from "firebase/analytics";
 import { getAuth as _getAuth, type Auth } from "firebase/auth";
-import { getFirestore as _getFirestore, initializeFirestore, type Firestore } from "firebase/firestore";
+import {
+  getFirestore as _getFirestore,
+  initializeFirestore,
+  type Firestore,
+} from "firebase/firestore";
 
 // Web app Firebase configuration (public; safe to expose in client)
 const firebaseConfig = {
