@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/spa/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "dist/server/production.mjs",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/dist/server/production.mjs"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/spa/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
