@@ -12,6 +12,7 @@ import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
 import * as courses from "./routes/courses";
 import * as notifications from "./routes/notifications";
+import * as adaptive from "./routes/adaptive";
 import { initFirebase } from "./firebase";
 // Firebase Admin initialized at startup if service account provided
 
@@ -59,6 +60,13 @@ export function createServer() {
   // Courses
   app.get("/api/courses", courses.listCourses);
   app.post("/api/courses", courses.createCourse);
+
+  // Adaptive Learning & Analytics
+  app.post("/api/engage", adaptive.logEngagement);
+  app.get("/api/predict-performance", adaptive.predictPerformance);
+  app.post("/api/adaptive/next", adaptive.getNextDifficulty);
+  app.post("/api/learning-style", adaptive.submitLearningStyle);
+  app.get("/api/learning-style", adaptive.getLearningStyle);
 
   // Chat
   app.get("/api/chat", chatRoutes.getMessages);
