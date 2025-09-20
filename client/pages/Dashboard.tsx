@@ -18,29 +18,35 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const u = await fetch("/api/users/me");
-      if (u.ok) {
-        const data = await u.json();
-        setName(data.name ?? "Student");
-      }
-      const pg = await fetch("/api/progress");
-      if (pg.ok)
-        setProgress(
-          (
-            (await pg.json()) as {
-              progress: { course: string; value: number }[];
-            }
-          ).progress,
-        );
-      const rec = await fetch("/api/recommendations");
-      if (rec.ok)
-        setRecommendations(
-          (
-            (await rec.json()) as {
-              items: { id: string; title: string; reason: string }[];
-            }
-          ).items,
-        );
+      try {
+        const u = await fetch("/api/users/me");
+        if (u.ok) {
+          const data = await u.json();
+          setName(data.name ?? "Student");
+        }
+      } catch {}
+      try {
+        const pg = await fetch("/api/progress");
+        if (pg.ok)
+          setProgress(
+            (
+              (await pg.json()) as {
+                progress: { course: string; value: number }[];
+              }
+            ).progress,
+          );
+      } catch {}
+      try {
+        const rec = await fetch("/api/recommendations");
+        if (rec.ok)
+          setRecommendations(
+            (
+              (await rec.json()) as {
+                items: { id: string; title: string; reason: string }[];
+              }
+            ).items,
+          );
+      } catch {}
     })();
   }, []);
 
