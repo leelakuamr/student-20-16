@@ -160,17 +160,7 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-3 md:flex">
-            {user?.role && (
-              <span className="rounded-full border px-2 py-0.5 text-xs">
-                {user.role === "admin"
-                  ? "Admin"
-                  : user.role === "instructor"
-                    ? "Instructor / Teacher"
-                    : user.role === "parent"
-                      ? "Parent / Guardian"
-                      : "Student"}
-              </span>
-            )}
+            {user?.role && <RoleBadge role={user.role} />}
           </div>
           <AuthControls />
         </div>
