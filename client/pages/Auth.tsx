@@ -40,30 +40,8 @@ export default function Auth({
       } else {
         await register(name, email, password, role, remember);
       }
-      // Redirect by role
-      try {
-        const auth = getAuth();
-        const db = getFirestore();
-        const uid = auth.currentUser?.uid;
-        let dest = "/dashboard";
-        if (uid) {
-          const snap = await getDoc(doc(db, "users", uid));
-          const r =
-            (snap.exists() ? (snap.data() as any).role : undefined) ||
-            "student";
-          dest =
-            r === "admin"
-              ? "/admin"
-              : r === "instructor"
-                ? "/instructor"
-                : r === "parent"
-                  ? "/parent"
-                  : "/dashboard";
-        }
-        nav(dest);
-      } catch {
-        nav("/dashboard");
-      }
+      // Redirect to role-based home page
+      nav("/home");
     } catch (e) {
       setErr(mode === "login" ? "Login failed" : "Registration failed");
     }

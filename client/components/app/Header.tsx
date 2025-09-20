@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast";
 
 const navItems = [
   { to: "/", label: "Home" },
-  { to: "/dashboard", label: "Student" },
+  { to: "/home", label: "Dashboard" },
   { to: "/instructor", label: "Instructor" },
   { to: "/admin", label: "Admin" },
   { to: "/parent", label: "Parent" },
@@ -21,7 +21,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-background/70">
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to={user ? "/home" : "/"} className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary to-secondary" />
           <span className="text-lg font-extrabold tracking-tight">
             AdeptLearn
@@ -61,7 +61,7 @@ export function Header() {
                 return role === "instructor" || role === "admin";
               if (item.to === "/parent")
                 return role === "parent" || role === "admin";
-              if (item.to === "/dashboard") return !!user; // any authenticated user
+              if (item.to === "/home") return !!user; // any authenticated user
               return true; // public
             })
             .map((item) => (
@@ -188,7 +188,7 @@ export function Header() {
                     return role === "instructor" || role === "admin";
                   if (item.to === "/parent")
                     return role === "parent" || role === "admin";
-                  if (item.to === "/dashboard") return !!user;
+                  if (item.to === "/home") return !!user;
                   return true;
                 })
                 .map((it) => (

@@ -21,7 +21,13 @@ export function ProtectedRoute({
     !roles.includes(user.role) &&
     user.role !== "admin"
   ) {
-    return <Navigate to="/dashboard" replace />;
+    // Redirect to role-specific dashboard
+    const roleDashboard = 
+      user.role === "instructor" ? "/instructor" :
+      user.role === "parent" ? "/parent" :
+      user.role === "admin" ? "/admin" :
+      "/dashboard";
+    return <Navigate to={roleDashboard} replace />;
   }
 
   return children;

@@ -25,6 +25,7 @@ import ProfilePage from "./pages/Profile";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/app/ProtectedRoute";
+import { RoleRedirect } from "./components/app/RoleRedirect";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/home" element={<RoleRedirect />} />
               <Route
                 path="/dashboard"
                 element={

@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
         setUser(null);
-        setToken(null);
+          setToken(null);
         return;
       }
       const idToken = await fbUser.getIdToken();
