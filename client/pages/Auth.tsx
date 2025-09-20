@@ -27,11 +27,17 @@ export default function Auth({
   // register-only
   const [name, setName] = useState("");
   const [role, setRole] = useState("student");
+  const ADMIN_ALLOWED_EMAILS = new Set<string>(["eedupugantil@gmail.com"]);
+  const adminAllowed = ADMIN_ALLOWED_EMAILS.has(email.trim().toLowerCase());
 
   const emailValid = /.+@.+\..+/.test(email);
   const passValid = password.length >= 6;
   const canSubmit =
     emailValid && passValid && (mode === "login" || name.trim().length > 0);
+
+  useEffect(() => {
+    if (!adminAllowed && role === "admin") setRole("student");
+  }, [adminAllowed]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -169,6 +175,9 @@ export default function Auth({
                 <option value="student">Student</option>
                 <option value="instructor">Instructor / Teacher</option>
                 <option value="parent">Parent / Guardian</option>
+                {adminAllowed && (
+                  <option value="admin">Platform Admin</option>
+                )}
               </select>
               <p className="mt-1 text-xs text-muted-foreground">
                 Choose how you’ll use the app (you can change later).
