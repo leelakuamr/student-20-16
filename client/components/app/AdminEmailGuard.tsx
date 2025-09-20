@@ -9,7 +9,10 @@ export function AdminEmailGuard({
   const { user } = useAuth();
   const location = useLocation();
 
-  if (!user || user.email !== allowedEmail) {
+  const isAdmin = user?.role === "admin";
+  const emailAllowed = allowedEmail ? user?.email === allowedEmail : false;
+
+  if (!user || (!isAdmin && !emailAllowed)) {
     return (
       <Navigate
         to={user ? "/home" : "/login"}
