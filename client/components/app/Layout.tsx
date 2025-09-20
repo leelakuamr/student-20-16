@@ -3,8 +3,11 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { ChatBot } from "./ChatBot";
 import { BottomNav } from "./BottomNav";
+import { ChatRoom } from "./ChatRoom";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Layout({ children }: PropsWithChildren) {
+  const { user } = useAuth();
   return (
     <div className="flex min-h-screen flex-col">
       <a
@@ -18,7 +21,7 @@ export function Layout({ children }: PropsWithChildren) {
         <div className="container mx-auto px-4 py-6">{children}</div>
       </main>
       <Footer />
-      <ChatBot />
+      {user?.role === "student" ? <ChatRoom roomName="Global Chat" /> : <ChatBot />}
       <BottomNav />
     </div>
   );
