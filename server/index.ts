@@ -39,6 +39,17 @@ export function createServer() {
   app.all("/api/discussions", edu.handleDiscussions);
   app.delete("/api/discussions/:id", edu.handleDeleteDiscussion);
   app.get("/api/discussions/stream", edu.handleDiscussionStream);
+
+  // Per-course Discussions
+  app.all("/api/courses/:courseId/discussions", edu.handleCourseDiscussions);
+  app.get(
+    "/api/courses/:courseId/discussions/stream",
+    edu.handleCourseDiscussionStream,
+  );
+  app.delete(
+    "/api/courses/:courseId/discussions/:id",
+    edu.handleDeleteCourseDiscussion,
+  );
   app.all("/api/assignments", edu.handleAssignments);
 
   // Courses

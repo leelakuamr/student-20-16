@@ -1,7 +1,29 @@
 type Props = { src: string; title: string; poster?: string };
 
-function getYouTubeId(url: string) {
-  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+function getYouTubeId(input: string) {
+  try {
+    const url = new URL(input);
+    const host = url.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = url.pathname.split("/").filter(Boolean)[0];
+      return id && id.length === 11 ? id : null;
+    }
+    if (host.endsWith("youtube.com")) {
+      const v = url.searchParams.get("v");
+      if (v && v.length === 11) return v;
+      const parts = url.pathname.split("/").filter(Boolean);
+      // handle /embed/{id} and /live/{id}
+      const idx = parts.findIndex((p) => p === "embed" || p === "live");
+      if (idx !== -1 && parts[idx + 1] && parts[idx + 1].length === 11) {
+        return parts[idx + 1];
+      }
+    }
+  } catch {
+    // fallthrough to regex
+  }
+  const m = input.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/,
+  );
   return m ? m[1] : null;
 }
 
@@ -30,7 +52,9 @@ export function VideoPlayer({ src, title, poster }: Props) {
           Your browser does not support the video tag.
         </video>
       )}
-      <figcaption className="p-3 text-sm text-muted-foreground">{title}</figcaption>
+      <figcaption className="p-3 text-sm text-muted-foreground">
+        {title}
+      </figcaption>
     </figure>
   );
 }

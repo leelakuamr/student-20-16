@@ -55,7 +55,9 @@ export function getFirestore(): Firestore {
     try {
       firestore = initializeFirestore(app, {
         experimentalAutoDetectLongPolling: true,
-      });
+        experimentalForceLongPolling: true,
+        useFetchStreams: false,
+      } as any);
     } catch (_e) {
       // Fallback to default if initializeFirestore already called elsewhere
       firestore = _getFirestore(app);

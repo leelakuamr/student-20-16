@@ -4,8 +4,9 @@ import { DiscussionBoard } from "@/components/app/DiscussionBoard";
 import { AssignmentForm } from "@/components/app/AssignmentForm";
 import { Leaderboard } from "@/components/app/Leaderboard";
 import { CalendarWidget } from "@/components/app/CalendarWidget";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { CourseDiscussionBoard } from "@/components/app/CourseDiscussionBoard";
 
 export default function Dashboard() {
   const [name, setName] = useState("Student");
@@ -18,29 +19,35 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      const u = await fetch("/api/users/me");
-      if (u.ok) {
-        const data = await u.json();
-        setName(data.name ?? "Student");
-      }
-      const pg = await fetch("/api/progress");
-      if (pg.ok)
-        setProgress(
-          (
-            (await pg.json()) as {
-              progress: { course: string; value: number }[];
-            }
-          ).progress,
-        );
-      const rec = await fetch("/api/recommendations");
-      if (rec.ok)
-        setRecommendations(
-          (
-            (await rec.json()) as {
-              items: { id: string; title: string; reason: string }[];
-            }
-          ).items,
-        );
+      try {
+        const u = await fetch("/api/users/me");
+        if (u.ok) {
+          const data = await u.json();
+          setName(data.name ?? "Student");
+        }
+      } catch {}
+      try {
+        const pg = await fetch("/api/progress");
+        if (pg.ok)
+          setProgress(
+            (
+              (await pg.json()) as {
+                progress: { course: string; value: number }[];
+              }
+            ).progress,
+          );
+      } catch {}
+      try {
+        const rec = await fetch("/api/recommendations");
+        if (rec.ok)
+          setRecommendations(
+            (
+              (await rec.json()) as {
+                items: { id: string; title: string; reason: string }[];
+              }
+            ).items,
+          );
+      } catch {}
     })();
   }, []);
 
@@ -96,8 +103,38 @@ export default function Dashboard() {
         </section>
 
         <section className="space-y-4">
+          <h2 className="text-lg font-semibold">Course Videos</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <VideoPlayer
+              src="https://www.youtube.com/live/QPiYhoPljMs?si=5V8dvSlUNefsYef4"
+              title="Course Video 1"
+            />
+            <VideoPlayer
+              src="https://www.youtube.com/live/0rk-sKU7sRo?si=7i9_Qy4g-u1Zxvdy"
+              title="Course Video 2"
+            />
+            <VideoPlayer
+              src="https://www.youtube.com/live/8tQEJ3Scqvc?si=GM__ePh2HDloGd8C"
+              title="Course Video 3"
+            />
+            <VideoPlayer
+              src="https://www.youtube.com/live/sv3pqwnY6YY?si=HGGVIs7T9GvqjPq-"
+              title="Course Video 4"
+            />
+          </div>
+        </section>
+
+        <section className="space-y-4">
           <h2 className="text-lg font-semibold">Discussion Forum</h2>
           <DiscussionBoard />
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Course Discussions</h2>
+            <CourseSelector progress={progress} />
+          </div>
+          <CourseDiscussionsArea progress={progress} />
         </section>
 
         <section className="space-y-3 rounded-xl border bg-white/60 p-6 shadow-sm dark:bg-background">

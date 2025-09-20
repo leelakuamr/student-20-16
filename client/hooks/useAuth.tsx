@@ -10,7 +10,18 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  collection,
+  getDocs,
+  limit,
+  query,
+} from "firebase/firestore";
+
+const ADMIN_EMAILS = new Set<string>(["eedupugantil@gmail.com"]);
 
 type User = { id: string; name: string; email?: string; role?: string } | null;
 
@@ -53,17 +64,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
 
-      // Ensure profile doc exists and auto-promote admin email
+      // Ensure profile doc exists and auto-promote first user or approved email as admin
       try {
         const ref = doc(db, "users", fbUser.uid);
         const existing = await getDoc(ref);
+
+        let desiredRole: string | undefined = undefined;
+        if (!existing.exists()) {
+          let isFirstUser = false;
+          try {
+            const snap = await getDocs(
+              query(collection(db, "users"), limit(1)),
+            );
+            if (snap.empty) isFirstUser = true;
+          } catch (_e) {}
+          if (isFirstUser || ADMIN_EMAILS.has(fbUser.email || ""))
+            desiredRole = "admin";
+        } else {
+          const current = (existing.data() as any).role;
+          if (ADMIN_EMAILS.has(fbUser.email || "") && current !== "admin")
+            desiredRole = "admin";
+        }
+
         const payload: any = {
           uid: fbUser.uid,
           name: fbUser.displayName || fbUser.email || "",
           email: fbUser.email,
           updatedAt: serverTimestamp(),
         };
-        if (fbUser.email === "eedupugantil@gmail.com") payload.role = "admin";
+        if (desiredRole) payload.role = desiredRole;
         await setDoc(
           ref,
           { createdAt: serverTimestamp(), ...payload },
@@ -126,13 +155,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.warn("updateProfile failed", e);
     }
     try {
+      let computedRole = role;
+      try {
+        const snap = await getDocs(query(collection(db, "users"), limit(1)));
+        if (snap.empty || ADMIN_EMAILS.has(email)) computedRole = "admin";
+      } catch (_e) {
+        // ignore query errors
+      }
+
       await setDoc(
         doc(db, "users", cred.user.uid),
         {
           uid: cred.user.uid,
           name: name || cred.user.displayName || "",
           email: cred.user.email,
-          role: role || "student",
+          role: computedRole || "student",
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         },
