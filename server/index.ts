@@ -74,6 +74,9 @@ export function createServer() {
   // Admin
   app.post("/api/admin/role", adminRoutes.setUserRole);
 
+  // Notifications
+  app.post("/api/notify/instructor-request", notifications.notifyInstructorRequest);
+
   // Contact teachers
   app.get("/api/teachers", contactRoutes.listTeachers);
   app.post("/api/teachers", contactRoutes.createTeacher);
