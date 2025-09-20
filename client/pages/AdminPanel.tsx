@@ -1,4 +1,5 @@
 import { AdminLayout } from "@/components/app/admin/AdminLayout";
+import { AdminInstructorRequests } from "@/components/app/admin/AdminInstructorRequests";
 
 export default function AdminPanel() {
   return (
@@ -33,6 +34,8 @@ export default function AdminPanel() {
             ))}
           </ul>
         </section>
+
+        <AdminInstructorRequests />
       </div>
     </AdminLayout>
   );

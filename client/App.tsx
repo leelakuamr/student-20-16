@@ -23,11 +23,13 @@ import Gamification from "./pages/Gamification";
 import CalendarPage from "./pages/Calendar";
 import ContactTeachersPage from "./pages/ContactTeachers";
 import AdminTeachersPage from "./pages/AdminTeachers";
+import RequestInstructor from "./pages/RequestInstructor";
 import ProfilePage from "./pages/Profile";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/app/ProtectedRoute";
 import { RoleRedirect } from "./components/app/RoleRedirect";
+import { AdminEmailGuard } from "./components/app/AdminEmailGuard";
 
 const queryClient = new QueryClient();
 
@@ -65,7 +67,9 @@ const App = () => (
                 path="/admin"
                 element={
                   <ProtectedRoute roles={["admin"]}>
-                    <Admin />
+                    <AdminEmailGuard allowedEmail="eedupugantil@gmail.com">
+                      <Admin />
+                    </AdminEmailGuard>
                   </ProtectedRoute>
                 }
               />
@@ -131,11 +135,21 @@ const App = () => (
                 path="/admin/teachers"
                 element={
                   <ProtectedRoute roles={["admin"]}>
-                    <AdminTeachersPage />
+                    <AdminEmailGuard allowedEmail="eedupugantil@gmail.com">
+                      <AdminTeachersPage />
+                    </AdminEmailGuard>
                   </ProtectedRoute>
                 }
               />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route
+                path="/request-instructor"
+                element={
+                  <ProtectedRoute>
+                    <RequestInstructor />
+                  </ProtectedRoute>
+                }
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
