@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import { getFirestore } from "@/lib/firebase";
-import { collection, getDocs, query, where, updateDoc, doc, serverTimestamp, deleteField } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  deleteField,
+} from "firebase/firestore";
 
 export function AdminInstructorRequests() {
   const db = getFirestore();
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<Array<{ uid: string; name: string; email?: string }>>([]);
+  const [items, setItems] = useState<
+    Array<{ uid: string; name: string; email?: string }>
+  >([]);
 
   async function load() {
     setLoading(true);
@@ -19,7 +30,11 @@ export function AdminInstructorRequests() {
       const rows: Array<{ uid: string; name: string; email?: string }> = [];
       snap.forEach((d) => {
         const data = d.data() as any;
-        rows.push({ uid: d.id, name: data.name || data.email || d.id, email: data.email });
+        rows.push({
+          uid: d.id,
+          name: data.name || data.email || d.id,
+          email: data.email,
+        });
       });
       setItems(rows);
     } finally {
@@ -56,22 +71,45 @@ export function AdminInstructorRequests() {
     <section className="rounded-xl border">
       <div className="flex items-center justify-between border-b p-4">
         <div className="text-sm font-semibold">Instructor Requests</div>
-        <button onClick={load} className="rounded-md border px-2 py-1 text-sm disabled:opacity-50" disabled={loading}>Refresh</button>
+        <button
+          onClick={load}
+          className="rounded-md border px-2 py-1 text-sm disabled:opacity-50"
+          disabled={loading}
+        >
+          Refresh
+        </button>
       </div>
       <div className="divide-y">
-        {loading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
+        {loading && (
+          <div className="p-4 text-sm text-muted-foreground">Loading…</div>
+        )}
         {!loading && items.length === 0 && (
-          <div className="p-4 text-sm text-muted-foreground">No pending requests</div>
+          <div className="p-4 text-sm text-muted-foreground">
+            No pending requests
+          </div>
         )}
         {items.map((u) => (
-          <div key={u.uid} className="flex items-center justify-between p-4 text-sm">
+          <div
+            key={u.uid}
+            className="flex items-center justify-between p-4 text-sm"
+          >
             <div>
               <div className="font-medium">{u.name}</div>
               <div className="text-muted-foreground">{u.email}</div>
             </div>
             <div className="space-x-2">
-              <button onClick={() => approve(u.uid)} className="rounded-md bg-primary px-3 py-1 text-primary-foreground">Approve</button>
-              <button onClick={() => deny(u.uid)} className="rounded-md border px-3 py-1">Deny</button>
+              <button
+                onClick={() => approve(u.uid)}
+                className="rounded-md bg-primary px-3 py-1 text-primary-foreground"
+              >
+                Approve
+              </button>
+              <button
+                onClick={() => deny(u.uid)}
+                className="rounded-md border px-3 py-1"
+              >
+                Deny
+              </button>
             </div>
           </div>
         ))}

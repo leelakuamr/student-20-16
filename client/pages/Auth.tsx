@@ -132,7 +132,9 @@ export default function Auth({
                   type="button"
                   onClick={async () => {
                     try {
-                      const { sendPasswordResetEmail } = await import("firebase/auth");
+                      const { sendPasswordResetEmail } = await import(
+                        "firebase/auth"
+                      );
                       await sendPasswordResetEmail(getAuth(), email);
                       setResetSent(true);
                       notify("Password reset email sent");

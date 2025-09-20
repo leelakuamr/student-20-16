@@ -14,22 +14,31 @@ export default function AdminPanel() {
           ].map((m) => (
             <div key={m.label} className="rounded-xl border p-6">
               <p className="text-sm text-muted-foreground">{m.label}</p>
-              <p className="mt-1 text-3xl font-extrabold">{m.value.toLocaleString()}</p>
+              <p className="mt-1 text-3xl font-extrabold">
+                {m.value.toLocaleString()}
+              </p>
             </div>
           ))}
         </section>
 
         <section className="rounded-xl border">
-          <div className="border-b p-4 text-sm font-semibold">Recent Activity</div>
+          <div className="border-b p-4 text-sm font-semibold">
+            Recent Activity
+          </div>
           <ul className="divide-y">
             {[
               "New course created: Biology 101",
               "User promoted to instructor: alice@example.com",
               "Flag resolved in Algebra discussion",
             ].map((i) => (
-              <li key={i} className="flex items-center justify-between p-4 text-sm">
+              <li
+                key={i}
+                className="flex items-center justify-between p-4 text-sm"
+              >
                 <span>{i}</span>
-                <button className="rounded-md border px-3 py-1 hover:bg-accent">View</button>
+                <button className="rounded-md border px-3 py-1 hover:bg-accent">
+                  View
+                </button>
               </li>
             ))}
           </ul>

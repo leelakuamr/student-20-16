@@ -118,7 +118,12 @@ export default function Dashboard() {
               <button
                 key={it.key}
                 onClick={() =>
-                  toast({ title: "Coming soon", description: it.label, variant: "destructive", duration: 5000 })
+                  toast({
+                    title: "Coming soon",
+                    description: it.label,
+                    variant: "destructive",
+                    duration: 5000,
+                  })
                 }
                 className="flex items-center justify-between rounded-lg border px-3 py-2 text-left hover:bg-accent"
               >

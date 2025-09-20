@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const auth = getAuth();
     const db = getFirestore();
     let unsubDoc: (() => void) | null = null;
-    
+
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
         if (unsubDoc) unsubDoc();
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         return;
       }
-      
+
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
 
@@ -64,7 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           updatedAt: serverTimestamp(),
         };
         if (fbUser.email === "eedupugantil@gmail.com") payload.role = "admin";
-        await setDoc(ref, { createdAt: serverTimestamp(), ...payload }, { merge: true });
+        await setDoc(
+          ref,
+          { createdAt: serverTimestamp(), ...payload },
+          { merge: true },
+        );
       } catch (e) {
         // ignore
       }
@@ -86,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         () => setLoading(false),
       );
     });
-    
+
     return () => {
       unsub();
       if (unsubDoc) unsubDoc();
