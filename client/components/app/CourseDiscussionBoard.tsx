@@ -82,7 +82,10 @@ export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
   return (
     <div className="space-y-3">
       <div className="rounded-lg border p-4">
-        <label htmlFor={`discussion-${courseId}`} className="mb-2 block text-sm font-medium">
+        <label
+          htmlFor={`discussion-${courseId}`}
+          className="mb-2 block text-sm font-medium"
+        >
           Discuss this course
         </label>
         <textarea
@@ -106,9 +109,7 @@ export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
       </div>
 
       <ul className="space-y-2">
-        {loading && (
-          <li className="text-sm text-muted-foreground">Loading…</li>
-        )}
+        {loading && <li className="text-sm text-muted-foreground">Loading…</li>}
         {!loading && posts.length === 0 && (
           <li className="text-sm text-muted-foreground">No posts yet.</li>
         )}
@@ -117,7 +118,9 @@ export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
             <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{p.author}</span>
               <div className="flex items-center gap-3">
-                <time dateTime={p.createdAt}>{new Date(p.createdAt).toLocaleString()}</time>
+                <time dateTime={p.createdAt}>
+                  {new Date(p.createdAt).toLocaleString()}
+                </time>
                 <button
                   className="text-rose-600 hover:underline"
                   onClick={() => remove(p.id)}

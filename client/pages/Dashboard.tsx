@@ -105,10 +105,22 @@ export default function Dashboard() {
         <section className="space-y-4">
           <h2 className="text-lg font-semibold">Course Videos</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <VideoPlayer src="https://www.youtube.com/live/QPiYhoPljMs?si=5V8dvSlUNefsYef4" title="Course Video 1" />
-            <VideoPlayer src="https://www.youtube.com/live/0rk-sKU7sRo?si=7i9_Qy4g-u1Zxvdy" title="Course Video 2" />
-            <VideoPlayer src="https://www.youtube.com/live/8tQEJ3Scqvc?si=GM__ePh2HDloGd8C" title="Course Video 3" />
-            <VideoPlayer src="https://www.youtube.com/live/sv3pqwnY6YY?si=HGGVIs7T9GvqjPq-" title="Course Video 4" />
+            <VideoPlayer
+              src="https://www.youtube.com/live/QPiYhoPljMs?si=5V8dvSlUNefsYef4"
+              title="Course Video 1"
+            />
+            <VideoPlayer
+              src="https://www.youtube.com/live/0rk-sKU7sRo?si=7i9_Qy4g-u1Zxvdy"
+              title="Course Video 2"
+            />
+            <VideoPlayer
+              src="https://www.youtube.com/live/8tQEJ3Scqvc?si=GM__ePh2HDloGd8C"
+              title="Course Video 3"
+            />
+            <VideoPlayer
+              src="https://www.youtube.com/live/sv3pqwnY6YY?si=HGGVIs7T9GvqjPq-"
+              title="Course Video 4"
+            />
           </div>
         </section>
 

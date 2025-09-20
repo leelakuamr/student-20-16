@@ -10,7 +10,16 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp, getDoc, collection, getDocs, limit, query } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  collection,
+  getDocs,
+  limit,
+  query,
+} from "firebase/firestore";
 
 const ADMIN_EMAILS = new Set<string>(["eedupugantil@gmail.com"]);
 
@@ -64,13 +73,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!existing.exists()) {
           let isFirstUser = false;
           try {
-            const snap = await getDocs(query(collection(db, "users"), limit(1)));
+            const snap = await getDocs(
+              query(collection(db, "users"), limit(1)),
+            );
             if (snap.empty) isFirstUser = true;
           } catch (_e) {}
-          if (isFirstUser || ADMIN_EMAILS.has(fbUser.email || "")) desiredRole = "admin";
+          if (isFirstUser || ADMIN_EMAILS.has(fbUser.email || ""))
+            desiredRole = "admin";
         } else {
           const current = (existing.data() as any).role;
-          if (ADMIN_EMAILS.has(fbUser.email || "") && current !== "admin") desiredRole = "admin";
+          if (ADMIN_EMAILS.has(fbUser.email || "") && current !== "admin")
+            desiredRole = "admin";
         }
 
         const payload: any = {

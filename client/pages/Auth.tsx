@@ -175,9 +175,7 @@ export default function Auth({
                 <option value="student">Student</option>
                 <option value="instructor">Instructor / Teacher</option>
                 <option value="parent">Parent / Guardian</option>
-                {adminAllowed && (
-                  <option value="admin">Platform Admin</option>
-                )}
+                {adminAllowed && <option value="admin">Platform Admin</option>}
               </select>
               <p className="mt-1 text-xs text-muted-foreground">
                 Choose how you’ll use the app (you can change later).

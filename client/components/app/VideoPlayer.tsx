@@ -21,7 +21,9 @@ function getYouTubeId(input: string) {
   } catch {
     // fallthrough to regex
   }
-  const m = input.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  const m = input.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/,
+  );
   return m ? m[1] : null;
 }
 
@@ -50,7 +52,9 @@ export function VideoPlayer({ src, title, poster }: Props) {
           Your browser does not support the video tag.
         </video>
       )}
-      <figcaption className="p-3 text-sm text-muted-foreground">{title}</figcaption>
+      <figcaption className="p-3 text-sm text-muted-foreground">
+        {title}
+      </figcaption>
     </figure>
   );
 }

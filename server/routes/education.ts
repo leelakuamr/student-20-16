@@ -41,7 +41,10 @@ const sseClients: import("http").ServerResponse[] = [];
 const courseSseClients = new Map<string, import("http").ServerResponse[]>();
 
 async function readCourseDiscussionsMap() {
-  const map = (await readJSON("course-discussions.json", {} as Record<string, any[]>)) as Record<string, any[]>;
+  const map = (await readJSON(
+    "course-discussions.json",
+    {} as Record<string, any[]>,
+  )) as Record<string, any[]>;
   return map;
 }
 
@@ -150,7 +153,8 @@ export const handleCourseDiscussions: RequestHandler = async (req, res) => {
   }
   if (req.method === "POST") {
     const { content } = req.body as { content?: string };
-    if (!content || !content.trim()) return res.status(400).json({ error: "content required" });
+    if (!content || !content.trim())
+      return res.status(400).json({ error: "content required" });
     const map = await readCourseDiscussionsMap();
     const arr = map[courseId] ?? [];
     const post = {
@@ -180,7 +184,10 @@ export const handleCourseDiscussions: RequestHandler = async (req, res) => {
   return res.status(405).end();
 };
 
-export const handleCourseDiscussionStream: RequestHandler = async (req, res) => {
+export const handleCourseDiscussionStream: RequestHandler = async (
+  req,
+  res,
+) => {
   const { courseId } = req.params as { courseId?: string };
   if (!courseId) return res.status(400).end();
   res.setHeader("Content-Type", "text/event-stream");
@@ -215,9 +222,13 @@ export const handleCourseDiscussionStream: RequestHandler = async (req, res) => 
   });
 };
 
-export const handleDeleteCourseDiscussion: RequestHandler = async (req, res) => {
+export const handleDeleteCourseDiscussion: RequestHandler = async (
+  req,
+  res,
+) => {
   const { courseId, id } = req.params as { courseId?: string; id?: string };
-  if (!courseId || !id) return res.status(400).json({ error: "courseId and id required" });
+  if (!courseId || !id)
+    return res.status(400).json({ error: "courseId and id required" });
   const map = await readCourseDiscussionsMap();
   const arr = map[courseId] ?? [];
   const idx = arr.findIndex((d: any) => d.id === id);
