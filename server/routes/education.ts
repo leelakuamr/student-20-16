@@ -213,7 +213,11 @@ export const handleAssignments: RequestHandler = async (req, res) => {
           await fs.writeFile(path.join(uploadsDir, fileName), buffer);
         } else {
           fileName = `${id}_note.txt`;
-          await fs.writeFile(path.join(uploadsDir, fileName), note ?? "", "utf-8");
+          await fs.writeFile(
+            path.join(uploadsDir, fileName),
+            note ?? "",
+            "utf-8",
+          );
         }
         current.path = `/uploads/${fileName}`;
       } catch (e) {

@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 
-type Submission = { id: string; filename: string; submittedAt: string; status: "submitted" | "graded" | "draft"; grade?: number; note?: string; path?: string };
+type Submission = {
+  id: string;
+  filename: string;
+  submittedAt: string;
+  status: "submitted" | "graded" | "draft";
+  grade?: number;
+  note?: string;
+  path?: string;
+};
 
 export function AssignmentForm() {
   const [file, setFile] = useState<File | null>(null);
@@ -35,12 +43,18 @@ export function AssignmentForm() {
     const res = await fetch(target, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: editingId || undefined, filename: nameToUse, contentBase64, note }),
+      body: JSON.stringify({
+        id: editingId || undefined,
+        filename: nameToUse,
+        contentBase64,
+        note,
+      }),
     });
     if (res.ok) {
       const data = (await res.json()) as { submission: Submission };
       setSubmissions((prev) => {
-        if (editingId) return prev.map((s) => (s.id === editingId ? data.submission : s));
+        if (editingId)
+          return prev.map((s) => (s.id === editingId ? data.submission : s));
         return [data.submission, ...prev];
       });
       setFile(null);
@@ -69,7 +83,9 @@ export function AssignmentForm() {
   return (
     <div className="space-y-4">
       <div className="rounded-lg border p-4">
-        <label className="mb-2 block text-sm font-medium">Write your assignment</label>
+        <label className="mb-2 block text-sm font-medium">
+          Write your assignment
+        </label>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -91,7 +107,12 @@ export function AssignmentForm() {
           {editingId && (
             <button
               className="rounded-md border px-3 py-1.5 disabled:opacity-50"
-              onClick={() => { setEditingId(null); setFile(null); setNote(""); setFilename(""); }}
+              onClick={() => {
+                setEditingId(null);
+                setFile(null);
+                setNote("");
+                setFilename("");
+              }}
               disabled={loading}
             >
               Cancel
@@ -107,15 +128,23 @@ export function AssignmentForm() {
         </div>
       </div>
       <div className="rounded-lg border">
-        <div className="border-b p-3 text-sm font-semibold">Your submissions</div>
+        <div className="border-b p-3 text-sm font-semibold">
+          Your submissions
+        </div>
         <ul className="divide-y">
           {submissions.map((s) => (
             <li key={s.id} className="p-3 text-sm">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate font-medium">{s.filename}</p>
-                  <p className="text-muted-foreground">{new Date(s.submittedAt).toLocaleString()}</p>
-                  {s.note && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{s.note}</p>}
+                  <p className="text-muted-foreground">
+                    {new Date(s.submittedAt).toLocaleString()}
+                  </p>
+                  {s.note && (
+                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                      {s.note}
+                    </p>
+                  )}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   {s.path && (
@@ -130,7 +159,12 @@ export function AssignmentForm() {
                   )}
                   <button
                     className="rounded-md border px-2 py-1 text-xs"
-                    onClick={() => { setEditingId(s.id); setNote(s.note || ""); setFilename(s.filename || ""); setFile(null); }}
+                    onClick={() => {
+                      setEditingId(s.id);
+                      setNote(s.note || "");
+                      setFilename(s.filename || "");
+                      setFile(null);
+                    }}
                   >
                     Edit
                   </button>
@@ -138,13 +172,21 @@ export function AssignmentForm() {
                     className="rounded-md border px-2 py-1 text-xs text-destructive"
                     onClick={async () => {
                       if (!confirm("Delete this submission?")) return;
-                      await fetch('/api/assignments', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: s.id }) });
-                      setSubmissions((prev) => prev.filter((x) => x.id !== s.id));
+                      await fetch("/api/assignments", {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: s.id }),
+                      });
+                      setSubmissions((prev) =>
+                        prev.filter((x) => x.id !== s.id),
+                      );
                     }}
                   >
                     Delete
                   </button>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{s.status}</span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                    {s.status}
+                  </span>
                   {s.grade != null && (
                     <span className="ml-1 text-xs">Grade: {s.grade}%</span>
                   )}

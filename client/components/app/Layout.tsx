@@ -21,7 +21,11 @@ export function Layout({ children }: PropsWithChildren) {
         <div className="container mx-auto px-4 py-6">{children}</div>
       </main>
       <Footer />
-      {user?.role === "student" ? <ChatRoom roomName="Global Chat" /> : <ChatBot />}
+      {user?.role === "student" ? (
+        <ChatRoom roomName="Global Chat" />
+      ) : (
+        <ChatBot />
+      )}
       <BottomNav />
     </div>
   );

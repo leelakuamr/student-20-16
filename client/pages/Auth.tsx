@@ -51,16 +51,15 @@ export default function Auth({
       nav("/home");
     } catch (e: any) {
       const code = e?.code || e?.message || "";
-      const friendly =
-        /invalid-email/i.test(code)
-          ? "Invalid email address."
-          : /email-already-in-use/i.test(code)
+      const friendly = /invalid-email/i.test(code)
+        ? "Invalid email address."
+        : /email-already-in-use/i.test(code)
           ? "Email already in use. Try signing in."
           : /weak-password/i.test(code)
-          ? "Password should be at least 6 characters."
-          : mode === "login"
-          ? "Login failed"
-          : "Registration failed";
+            ? "Password should be at least 6 characters."
+            : mode === "login"
+              ? "Login failed"
+              : "Registration failed";
       setErr(friendly);
       notify.error(friendly);
     }
