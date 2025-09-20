@@ -385,3 +385,67 @@ export const handleAssignments: RequestHandler = async (req, res) => {
   }
   res.status(405).end();
 };
+
+export const handleInstructorSubmissions: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
+  const me = await db.doc(`users/${decoded.uid}`).get();
+  const role = (me.data() as any)?.role;
+  if (role !== "instructor" && role !== "admin")
+    return res.status(403).json({ error: "Forbidden" });
+  const snap = await db
+    .collection("submissions")
+    .orderBy("submittedAt", "desc")
+    .limit(50)
+    .get();
+  const submissions = await Promise.all(
+    snap.docs.map(async (d) => {
+      const s = d.data() as any;
+      let name = s.userName as string | undefined;
+      if (!name && s.userId) {
+        try {
+          const us = await db.doc(`users/${s.userId}`).get();
+          name = (us.data() as any)?.name || (us.data() as any)?.email || s.userId;
+        } catch {}
+      }
+      return { id: d.id, ...s, userName: name };
+    }),
+  );
+  return res.json({ submissions });
+};
+
+export const handleGradeSubmission: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
+  const me = await db.doc(`users/${decoded.uid}`).get();
+  const role = (me.data() as any)?.role;
+  if (role !== "instructor" && role !== "admin")
+    return res.status(403).json({ error: "Forbidden" });
+  const { id } = req.params as { id?: string };
+  if (!id) return res.status(400).json({ error: "id required" });
+  const { grade } = req.body as { grade: number | string };
+  if (grade == null) return res.status(400).json({ error: "grade required" });
+  const ref = db.doc(`submissions/${id}`);
+  const snap = await ref.get();
+  if (!snap.exists) return res.status(404).json({ error: "Not found" });
+  let numeric: number | undefined;
+  if (typeof grade === "number") numeric = Math.max(0, Math.min(100, grade));
+  else {
+    const map: Record<string, number> = { A: 95, B: 85, C: 75, D: 65, F: 50 };
+    numeric = map[String(grade).trim().toUpperCase()] ?? undefined;
+  }
+  if (numeric == null)
+    return res.status(400).json({ error: "invalid grade; provide 0-100 or A-F" });
+  await ref.set(
+    {
+      status: "graded",
+      grade: numeric,
+      gradedAt: admin.firestore.FieldValue.serverTimestamp(),
+      graderId: decoded.uid,
+    },
+    { merge: true },
+  );
+  return res.json({ ok: true, id, grade: numeric });
+};
