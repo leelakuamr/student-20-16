@@ -10,7 +10,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, collection, getDocs, limit, query } from "firebase/firestore";
 
 type User = { id: string; name: string; email?: string; role?: string } | null;
 
@@ -53,17 +53,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
 
-      // Ensure profile doc exists and auto-promote admin email
+      // Ensure profile doc exists and auto-promote first user as admin
       try {
         const ref = doc(db, "users", fbUser.uid);
         const existing = await getDoc(ref);
+
+        let initialRole: string | undefined = undefined;
+        if (!existing.exists()) {
+          try {
+            const snap = await getDocs(query(collection(db, "users"), limit(1)));
+            if (snap.empty) initialRole = "admin";
+          } catch (_e) {
+            // ignore query errors; default role will apply
+          }
+        }
+
         const payload: any = {
           uid: fbUser.uid,
           name: fbUser.displayName || fbUser.email || "",
           email: fbUser.email,
           updatedAt: serverTimestamp(),
         };
-        if (fbUser.email === "eedupugantil@gmail.com") payload.role = "admin";
+        if (initialRole) payload.role = initialRole;
         await setDoc(
           ref,
           { createdAt: serverTimestamp(), ...payload },
@@ -126,13 +137,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.warn("updateProfile failed", e);
     }
     try {
+      let computedRole = role;
+      try {
+        const snap = await getDocs(query(collection(db, "users"), limit(1)));
+        if (snap.empty) computedRole = "admin";
+      } catch (_e) {
+        // ignore query errors
+      }
+
       await setDoc(
         doc(db, "users", cred.user.uid),
         {
           uid: cred.user.uid,
           name: name || cred.user.displayName || "",
           email: cred.user.email,
-          role: role || "student",
+          role: computedRole || "student",
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         },
