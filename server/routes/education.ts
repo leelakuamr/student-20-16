@@ -60,19 +60,40 @@ export const handleGetProgress: RequestHandler = async (req, res) => {
   return res.json({ progress });
 };
 
-export const handleGetRecommendations: RequestHandler = async (_req, res) => {
-  const items = [
-    {
-      id: "r1",
-      title: "Practice Linear Equations",
-      reason: "Struggling with recent quiz",
-    },
-    {
-      id: "r2",
-      title: "Watch Atoms & Bonds",
-      reason: "Low engagement in science module",
-    },
-  ];
+export const handleGetRecommendations: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
+
+  const [progressSnap, engageSnap] = await Promise.all([
+    db.collection("progress").where("userId", "==", decoded.uid).get(),
+    db.collection("engagement").where("userId", "==", decoded.uid).orderBy("createdAt", "desc").limit(200).get(),
+  ]);
+
+  const progress = progressSnap.docs.map((d) => d.data() as any);
+  const engagement = engageSnap.docs.map((d) => d.data() as any);
+
+  const low = progress
+    .filter((p) => typeof p.value === "number" && p.value < 70)
+    .sort((a, b) => (a.value as number) - (b.value as number))
+    .slice(0, 3);
+
+  const watchedCourses = new Set(
+    engagement.filter((e) => e.eventType === "video_watch" && e.course).map((e) => e.course as string),
+  );
+
+  const items: { id: string; title: string; reason: string }[] = [];
+  for (const p of low) {
+    const reason = watchedCourses.has(p.course)
+      ? `Strengthen ${p.course} with targeted practice`
+      : `Low progress in ${p.course}; start with an overview video`;
+    items.push({ id: `rec_${p.course}`, title: `Focus: ${p.course}`, reason });
+  }
+
+  if (items.length === 0) {
+    items.push({ id: "rec_review", title: "Review recent topics", reason: "Keep momentum with spaced repetition" });
+  }
+
   res.json({ items });
 };
 
