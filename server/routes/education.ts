@@ -20,8 +20,8 @@ async function getAuthedUser(req: any) {
 
 export const handleGetUser: RequestHandler = async (req, res) => {
   const decoded = await getAuthedUser(req);
-  const db = getFirestore();
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
   const ref = db.doc(`users/${decoded.uid}`);
   const snap = await ref.get();
   if (!snap.exists) return res.json({ id: decoded.uid, name: decoded.email });
