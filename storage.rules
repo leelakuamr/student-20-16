@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && request.auth.token.role == 'admin'; }
+    function isInstructor() { return isSignedIn() && request.auth.token.role == 'instructor'; }
+    function isParent() { return isSignedIn() && request.auth.token.role == 'parent'; }
+    function isOwnerPath(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    // Assignments uploads per user
+    match /assignments/{userId}/{filePath=**} {
+      allow read: if isOwnerPath(userId) || isAdmin() || isInstructor() || isParent();
+      allow write: if (isOwnerPath(userId) && !isParent()) || isAdmin() || isInstructor();
+    }
+
+    // Public assets (optional)
+    match /public/{allPaths=**} {
+      allow read: if true;
+    }
+
+    // Default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
