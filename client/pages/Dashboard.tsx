@@ -4,8 +4,9 @@ import { DiscussionBoard } from "@/components/app/DiscussionBoard";
 import { AssignmentForm } from "@/components/app/AssignmentForm";
 import { Leaderboard } from "@/components/app/Leaderboard";
 import { CalendarWidget } from "@/components/app/CalendarWidget";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { CourseDiscussionBoard } from "@/components/app/CourseDiscussionBoard";
 
 export default function Dashboard() {
   const [name, setName] = useState("Student");
