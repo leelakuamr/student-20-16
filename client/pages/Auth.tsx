@@ -38,8 +38,10 @@ export default function Auth({
     try {
       if (mode === "login") {
         await login(email, password, remember);
+        notify("Signed in successfully");
       } else {
         await register(name, email, password, role, remember);
+        notify("Account created");
       }
       // Redirect by role
       try {
@@ -67,6 +69,7 @@ export default function Auth({
       }
     } catch (e) {
       setErr(mode === "login" ? "Login failed" : "Registration failed");
+      notify.error(mode === "login" ? "Login failed" : "Registration failed");
     }
   }
 
