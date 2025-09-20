@@ -109,15 +109,26 @@ const sseClients: import("http").ServerResponse[] = [];
 const courseSseClients = new Map<string, import("http").ServerResponse[]>();
 
 export const handleDiscussions: RequestHandler = async (req, res) => {
-  const db = getFirestore();
   if (req.method === "GET") {
-    const snap = await db
-      .collection("discussions")
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .get();
-    const posts = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-    return res.json({ posts });
+    try {
+      const db = getFirestore();
+      const snap = await db
+        .collection("discussions")
+        .orderBy("createdAt", "desc")
+        .limit(50)
+        .get();
+      const posts = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+      return res.json({ posts });
+    } catch {
+      try {
+        const { readJSON } = await import("../utils/db");
+        const data = await readJSON<any>("discussions.json", []);
+        const posts = Array.isArray(data) ? data : data.posts || [];
+        return res.json({ posts });
+      } catch {
+        return res.json({ posts: [] });
+      }
+    }
   }
   if (req.method === "POST") {
     const decoded = await getAuthedUser(req);
