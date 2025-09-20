@@ -12,10 +12,14 @@ import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
 import * as courses from "./routes/courses";
 import * as notifications from "./routes/notifications";
-// Firebase Admin not initialized; client handles auth
+import { initFirebase } from "./firebase";
+// Firebase Admin initialized at startup if service account provided
 
 export function createServer() {
   const app = express();
+
+  // Initialize Firebase Admin if service account is provided via env
+  initFirebase();
 
   // Middleware
   app.use(cors());
