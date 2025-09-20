@@ -183,12 +183,13 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     return res.status(201).json({ submission: s });
   }
   if (req.method === "PATCH" || req.method === "PUT") {
-    const { id, filename, contentBase64, note, status } = req.body as {
+    const { id, filename, contentBase64, note, status, grade } = req.body as {
       id?: string;
       filename?: string;
       contentBase64?: string;
       note?: string;
       status?: string;
+      grade?: string | number | null;
     };
     if (!id) return res.status(400).json({ error: "id is required" });
     const submissions = await readJSON("submissions.json", [] as any[]);
@@ -198,6 +199,7 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     if (filename) current.filename = filename;
     if (typeof status === "string") current.status = status;
     if (typeof note === "string") current.note = note;
+    if (grade !== undefined) current.grade = grade;
     if (contentBase64 || note) {
       try {
         const fs = await import("fs/promises");
@@ -205,9 +207,8 @@ export const handleAssignments: RequestHandler = async (req, res) => {
         const uploadsDir = path.resolve(__dirname, "../uploads");
         await fs.mkdir(uploadsDir, { recursive: true });
         let fileName: string;
-        let buffer: Buffer | null = null;
         if (contentBase64) {
-          buffer = Buffer.from(contentBase64, "base64");
+          const buffer = Buffer.from(contentBase64, "base64");
           fileName = `${id}_${current.filename}`;
           await fs.writeFile(path.join(uploadsDir, fileName), buffer);
         } else {
