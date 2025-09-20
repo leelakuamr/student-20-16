@@ -4,12 +4,13 @@ service firebase.storage {
     function isSignedIn() { return request.auth != null; }
     function isAdmin() { return isSignedIn() && request.auth.token.role == 'admin'; }
     function isInstructor() { return isSignedIn() && request.auth.token.role == 'instructor'; }
+    function isParent() { return isSignedIn() && request.auth.token.role == 'parent'; }
     function isOwnerPath(userId) { return isSignedIn() && request.auth.uid == userId; }
 
     // Assignments uploads per user
     match /assignments/{userId}/{filePath=**} {
-      allow read: if isOwnerPath(userId) || isAdmin() || isInstructor();
-      allow write: if isOwnerPath(userId) || isAdmin() || isInstructor();
+      allow read: if isOwnerPath(userId) || isAdmin() || isInstructor() || isParent();
+      allow write: if (isOwnerPath(userId) && !isParent()) || isAdmin() || isInstructor();
     }
 
     // Public assets (optional)
