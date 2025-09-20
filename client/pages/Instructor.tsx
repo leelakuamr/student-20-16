@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ContactStudents } from "@/components/app/ContactStudents";
 
 export default function Instructor() {
   const [courses, setCourses] = useState<
@@ -54,7 +56,19 @@ export default function Instructor() {
       <section className="mt-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Your Courses</h2>
-          <form onSubmit={addCourse} className="hidden md:flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="rounded-md border px-3 py-1.5 text-sm">Contact Students</button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                  <DialogTitle>Contact a student</DialogTitle>
+                </DialogHeader>
+                <ContactStudents />
+              </DialogContent>
+            </Dialog>
+            <form onSubmit={addCourse} className="hidden md:flex items-center gap-2">
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -79,6 +93,7 @@ export default function Instructor() {
             />
             <button className="rounded-md border px-3 py-1.5 text-sm">Add</button>
           </form>
+          </div>
         </div>
         <div className="mt-3">
           {/* Mobile add form */}
