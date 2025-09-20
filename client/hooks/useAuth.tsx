@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 
-type User = { id: string; name: string; role?: string } | null;
+type User = { id: string; name: string; email?: string; role?: string } | null;
 
 type AuthContext = {
   user: User;
@@ -62,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser({
             id: fbUser.uid,
             name: fbUser.displayName || fbUser.email || "",
+            email: fbUser.email || undefined,
             role: data.role as string | undefined,
           });
           setLoading(false);

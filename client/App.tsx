@@ -13,6 +13,7 @@ import Instructor from "./pages/Instructor";
 import Admin from "./pages/Admin";
 import Parent from "./pages/Parent";
 import AdminPanel from "./pages/AdminPanel";
+import { AdminEmailGuard } from "./components/app/AdminEmailGuard";
 import Discussions from "./pages/Discussions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -72,7 +73,9 @@ const App = () => (
                 path="/admin-panel"
                 element={
                   <ProtectedRoute roles={["admin"]}>
-                    <AdminPanel />
+                    <AdminEmailGuard allowedEmail="eedupugantil@gmail.com">
+                      <AdminPanel />
+                    </AdminEmailGuard>
                   </ProtectedRoute>
                 }
               />
