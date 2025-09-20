@@ -56,6 +56,8 @@ export function createServer() {
     edu.handleDeleteCourseDiscussion,
   );
   app.all("/api/assignments", edu.handleAssignments);
+  app.get("/api/instructor/submissions", edu.handleInstructorSubmissions);
+  app.post("/api/submissions/:id/grade", edu.handleGradeSubmission);
 
   // Courses
   app.get("/api/courses", courses.listCourses);
@@ -87,6 +89,12 @@ export function createServer() {
   app.post("/api/badges", gm.awardBadge);
   app.get("/api/events", gm.getEvents);
   app.post("/api/events", gm.createEvent);
+
+  // Proctoring
+  const proctor = await import("./routes/proctor");
+  app.post("/api/proctor/start", proctor.startProctoring);
+  app.post("/api/proctor/heartbeat", proctor.heartbeat);
+  app.post("/api/proctor/end", proctor.endProctoring);
 
   // User management
   app.delete("/api/users/me", usersRoutes.deleteMe);

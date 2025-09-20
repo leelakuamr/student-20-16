@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 type Post = { id: string; author: string; content: string; createdAt: string };
 
@@ -18,6 +19,7 @@ function upsert(prev: Post[], added: Post): Post[] {
 }
 
 export function DiscussionBoard() {
+  const { token } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,12 @@ export function DiscussionBoard() {
     const ok = window.confirm("Delete this post?");
     if (!ok) return;
     try {
-      const res = await fetch(`/api/discussions/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/discussions/${id}`, {
+        method: "DELETE",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       if (res.ok) {
         setPosts((prev) => prev.filter((p) => p.id !== id));
       }
@@ -40,7 +47,11 @@ export function DiscussionBoard() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/discussions");
+        const res = await fetch("/api/discussions", {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
         if (res.ok) {
           const data = (await res.json()) as { posts: Post[] };
           setPosts(dedupeAndSort(data.posts));
@@ -80,7 +91,10 @@ export function DiscussionBoard() {
     try {
       const res = await fetch("/api/discussions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ content: content.trim() }),
       });
       if (res.ok) {

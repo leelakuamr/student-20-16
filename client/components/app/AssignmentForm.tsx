@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
-type Submission = { id: string; filename: string; submittedAt: string; status: "submitted" | "graded"; grade?: number };
+type Submission = {
+  id: string;
+  filename: string;
+  submittedAt: string;
+  status: "submitted" | "graded";
+  grade?: number;
+};
 
 export function AssignmentForm() {
+  const { token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [note, setNote] = useState("");
@@ -26,8 +34,15 @@ export function AssignmentForm() {
 
     const res = await fetch("/api/assignments", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: file?.name ?? `notes-${Date.now()}.txt`, contentBase64, note }),
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        filename: file?.name ?? `notes-${Date.now()}.txt`,
+        contentBase64,
+        note,
+      }),
     });
     if (res.ok) {
       const data = (await res.json()) as { submission: Submission };
@@ -41,7 +56,11 @@ export function AssignmentForm() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/assignments");
+        const res = await fetch("/api/assignments", {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
         if (res.ok) {
           const data = (await res.json()) as { submissions: Submission[] };
           setSubmissions(data.submissions);
@@ -55,7 +74,9 @@ export function AssignmentForm() {
   return (
     <div className="space-y-4">
       <div className="rounded-lg border p-4">
-        <label className="mb-2 block text-sm font-medium">Submit assignment</label>
+        <label className="mb-2 block text-sm font-medium">
+          Submit assignment
+        </label>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -78,17 +99,23 @@ export function AssignmentForm() {
         </div>
       </div>
       <div className="rounded-lg border">
-        <div className="border-b p-3 text-sm font-semibold">Your submissions</div>
+        <div className="border-b p-3 text-sm font-semibold">
+          Your submissions
+        </div>
         <ul className="divide-y">
           {submissions.map((s) => (
             <li key={s.id} className="p-3 text-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">{s.filename}</p>
-                  <p className="text-muted-foreground">{new Date(s.submittedAt).toLocaleString()}</p>
+                  <p className="text-muted-foreground">
+                    {new Date(s.submittedAt).toLocaleString()}
+                  </p>
                 </div>
                 <div>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{s.status}</span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
+                    {s.status}
+                  </span>
                   {s.grade != null && (
                     <span className="ml-2 text-xs">Grade: {s.grade}%</span>
                   )}

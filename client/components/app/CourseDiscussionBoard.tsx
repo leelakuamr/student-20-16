@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export type CourseDiscussionPost = {
   id: string;
@@ -16,6 +17,7 @@ function dedupeAndSort(list: CourseDiscussionPost[]): CourseDiscussionPost[] {
 }
 
 export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
+  const { token } = useAuth();
   const [posts, setPosts] = useState<CourseDiscussionPost[]>([]);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,11 @@ export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/courses/${courseId}/discussions`);
+        const res = await fetch(`/api/courses/${courseId}/discussions`, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
         if (res.ok) {
           const data = (await res.json()) as { posts: CourseDiscussionPost[] };
           setPosts(dedupeAndSort(data.posts));
@@ -57,7 +63,10 @@ export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
     try {
       const res = await fetch(`/api/courses/${courseId}/discussions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ content: content.trim() }),
       });
       if (res.ok) {
@@ -74,6 +83,9 @@ export function CourseDiscussionBoard({ courseId }: { courseId: string }) {
     try {
       const res = await fetch(`/api/courses/${courseId}/discussions/${id}`, {
         method: "DELETE",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       });
       if (res.ok) setPosts((prev) => prev.filter((p) => p.id !== id));
     } catch {}
