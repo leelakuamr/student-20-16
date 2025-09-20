@@ -18,10 +18,13 @@ export function RoleRedirect() {
 
   // Redirect based on user role
   const roleDashboard =
-    user.role === "instructor" ? "/instructor" :
-    user.role === "parent" ? "/parent" :
-    user.role === "admin" ? "/admin" :
-    "/dashboard"; // default for students
+    user.role === "instructor"
+      ? "/instructor"
+      : user.role === "parent"
+        ? "/parent"
+        : user.role === "admin"
+          ? "/admin"
+          : "/dashboard"; // default for students
 
   return <Navigate to={roleDashboard} replace />;
 }
