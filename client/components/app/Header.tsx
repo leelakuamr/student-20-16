@@ -59,7 +59,7 @@ export function Header() {
             .filter((item) => {
               const role = user?.role;
               if (item.to === "/admin") return role === "admin";
-              if (item.to === "/admin-panel") return role === "admin" && user?.email === "eedupugantil@gmail.com";
+              if (item.to === "/admin-panel") return user?.email === "eedupugantil@gmail.com";
               if (item.to === "/instructor")
                 return role === "instructor" || role === "admin";
               if (item.to === "/parent")
@@ -195,7 +195,7 @@ export function Header() {
                 .filter((item) => {
                   const role = user?.role;
                   if (item.to === "/admin") return role === "admin";
-                  if (item.to === "/admin-panel") return role === "admin" && user?.email === "eedupugantil@gmail.com";
+                  if (item.to === "/admin-panel") return user?.email === "eedupugantil@gmail.com";
                   if (item.to === "/instructor")
                     return role === "instructor" || role === "admin";
                   if (item.to === "/parent")
