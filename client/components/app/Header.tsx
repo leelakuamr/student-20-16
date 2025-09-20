@@ -1,5 +1,6 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
@@ -13,6 +14,24 @@ const navItems = [
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
 ] as const;
+
+function RoleBadge({ role }: { role: string }) {
+  const label =
+    role === "admin"
+      ? "Admin"
+      : role === "instructor"
+        ? "Instructor"
+        : role === "parent"
+          ? "Parent"
+          : "Student";
+  const variant: any =
+    role === "admin" ? "destructive" : role === "student" ? "default" : "secondary";
+  return (
+    <Badge variant={variant} className="rounded-full px-3 py-1 text-xs">
+      {label}
+    </Badge>
+  );
+}
 
 export function Header() {
   const location = useLocation();
