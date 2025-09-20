@@ -7,49 +7,37 @@ import { CalendarWidget } from "@/components/app/CalendarWidget";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { CourseDiscussionBoard } from "@/components/app/CourseDiscussionBoard";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Dashboard() {
-  const [name, setName] = useState("Student");
-  const [progress, setProgress] = useState<{ course: string; value: number }[]>(
-    [],
-  );
+  const { user } = useAuth();
+  const [progress, setProgress] = useState<{ course: string; value: number }[]>([
+    { course: "Mathematics", value: 75 },
+    { course: "Science", value: 60 },
+    { course: "English", value: 85 },
+    { course: "History", value: 45 },
+  ]);
   const [recommendations, setRecommendations] = useState<
     { id: string; title: string; reason: string }[]
-  >([]);
+  >([
+    {
+      id: "1",
+      title: "Complete Math Assignment",
+      reason: "Due in 2 days, worth 20% of grade",
+    },
+    {
+      id: "2", 
+      title: "Review Science Chapter 5",
+      reason: "Test coming up next week",
+    },
+    {
+      id: "3",
+      title: "Join Study Group",
+      reason: "Collaborate with classmates on History project",
+    },
+  ]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const u = await fetch("/api/users/me");
-        if (u.ok) {
-          const data = await u.json();
-          setName(data.name ?? "Student");
-        }
-      } catch {}
-      try {
-        const pg = await fetch("/api/progress");
-        if (pg.ok)
-          setProgress(
-            (
-              (await pg.json()) as {
-                progress: { course: string; value: number }[];
-              }
-            ).progress,
-          );
-      } catch {}
-      try {
-        const rec = await fetch("/api/recommendations");
-        if (rec.ok)
-          setRecommendations(
-            (
-              (await rec.json()) as {
-                items: { id: string; title: string; reason: string }[];
-              }
-            ).items,
-          );
-      } catch {}
-    })();
-  }, []);
+  const name = user?.name || "Student";
 
   return (
     <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-3">
@@ -191,6 +179,45 @@ export default function Dashboard() {
         <Leaderboard />
         <CalendarWidget />
       </aside>
+    </div>
+  );
+}
+
+// Helper components for course selection and discussions
+function CourseSelector({ progress }: { progress: { course: string; value: number }[] }) {
+  const [selectedCourse, setSelectedCourse] = useState(progress[0]?.course || "");
+
+  return (
+    <select
+      value={selectedCourse}
+      onChange={(e) => setSelectedCourse(e.target.value)}
+      className="rounded-md border px-3 py-1 text-sm"
+    >
+      {progress.map((course) => (
+        <option key={course.course} value={course.course}>
+          {course.course}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function CourseDiscussionsArea({ progress }: { progress: { course: string; value: number }[] }) {
+  return (
+    <div className="space-y-4">
+      {progress.map((course) => (
+        <div key={course.course} className="rounded-lg border p-4">
+          <h3 className="font-semibold">{course.course} Discussions</h3>
+          <p className="text-sm text-muted-foreground">
+            Progress: {course.value}% - Join the conversation!
+          </p>
+          <div className="mt-2">
+            <button className="text-sm text-blue-600 hover:underline">
+              View discussions →
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
