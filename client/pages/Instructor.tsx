@@ -1,31 +1,40 @@
 import { useState } from "react";
 
+import { useEffect, useState } from "react";
+
+type Submission = {
+  id: string;
+  filename: string;
+  submittedAt: string;
+  status: string;
+  grade?: string | number | null;
+  note?: string;
+  path?: string;
+};
+
 export default function Instructor() {
   const [courses, setCourses] = useState([
     { id: "c1", title: "Algebra I", students: 28, assignments: 12, description: "Introduction to algebraic concepts" },
     { id: "c2", title: "Chemistry Basics", students: 24, assignments: 10, description: "Fundamental chemistry principles" },
   ]);
-  const [submissions, setSubmissions] = useState([
-    {
-      id: "s1",
-      student: "Rohan",
-      assignment: "Quadratic HW",
-      status: "submitted",
-      grade: null,
-      submittedAt: "2024-01-15",
-    },
-    {
-      id: "s2",
-      student: "Aisha",
-      assignment: "Lab Report 1",
-      status: "graded",
-      grade: "A",
-      submittedAt: "2024-01-14",
-    },
-  ]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [newCourse, setNewCourse] = useState({ title: "", description: "" });
   const [editingCourse, setEditingCourse] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/assignments");
+        if (res.ok) {
+          const data = (await res.json()) as { submissions: Submission[] };
+          setSubmissions(data.submissions);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
 
   const createCourse = () => {
     if (newCourse.title.trim()) {
@@ -47,10 +56,17 @@ export default function Instructor() {
     setEditingCourse(null);
   };
 
-  const gradeSubmission = (id: string, grade: string) => {
-    setSubmissions(submissions.map(s => 
-      s.id === id ? { ...s, status: "graded", grade } : s
-    ));
+  const gradeSubmission = async (id: string, grade: string) => {
+    try {
+      await fetch("/api/assignments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: "graded", grade }),
+      });
+      setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, status: "graded", grade } : s)));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -194,40 +210,43 @@ export default function Instructor() {
           <div className="md:hidden space-y-2">
             {submissions.map((s) => (
               <div key={s.id} className="rounded-lg border p-3">
-                <div className="font-medium">{s.student}</div>
-                <div className="mt-1 text-sm">{s.assignment}</div>
+                <div className="font-medium truncate">{s.filename}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{new Date(s.submittedAt).toLocaleString()}</div>
+                {s.note && <div className="mt-1 text-sm line-clamp-2">{s.note}</div>}
                 <div className="mt-2 flex items-center justify-between">
                   <span className={`rounded-full px-2 py-0.5 text-xs ${
                     s.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {s.status}
                   </span>
-                  {s.grade && (
+                  {s.grade != null && (
                     <span className="font-semibold text-green-600">Grade: {s.grade}</span>
                   )}
                 </div>
-                {s.status === 'submitted' && (
-                  <div className="mt-2 flex gap-1">
-                    <button
-                      onClick={() => gradeSubmission(s.id, 'A')}
-                      className="rounded bg-green-500 px-2 py-1 text-xs text-white"
-                    >
-                      Grade A
-                    </button>
-                    <button
-                      onClick={() => gradeSubmission(s.id, 'B')}
-                      className="rounded bg-blue-500 px-2 py-1 text-xs text-white"
-                    >
-                      Grade B
-                    </button>
-                    <button
-                      onClick={() => gradeSubmission(s.id, 'C')}
-                      className="rounded bg-orange-500 px-2 py-1 text-xs text-white"
-                    >
-                      Grade C
-                    </button>
-                  </div>
-                )}
+                <div className="mt-2 flex gap-1">
+                  {s.path && (
+                    <a className="rounded border px-2 py-1 text-xs" href={s.path} target="_blank" rel="noreferrer">
+                      View
+                    </a>
+                  )}
+                  {s.status !== 'graded' && (
+                    <>
+                      <button onClick={() => gradeSubmission(s.id, 'A')} className="rounded bg-green-500 px-2 py-1 text-xs text-white">A</button>
+                      <button onClick={() => gradeSubmission(s.id, 'B')} className="rounded bg-blue-500 px-2 py-1 text-xs text-white">B</button>
+                      <button onClick={() => gradeSubmission(s.id, 'C')} className="rounded bg-orange-500 px-2 py-1 text-xs text-white">C</button>
+                    </>
+                  )}
+                  <button
+                    className="rounded border px-2 py-1 text-xs text-red-600"
+                    onClick={async () => {
+                      if (!confirm('Delete this submission?')) return;
+                      await fetch('/api/assignments', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: s.id }) });
+                      setSubmissions((prev) => prev.filter((x) => x.id !== s.id));
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -236,9 +255,9 @@ export default function Instructor() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left">
                 <tr>
-                  <th className="p-3">Student</th>
-                  <th className="p-3">Assignment</th>
+                  <th className="p-3">File</th>
                   <th className="p-3">Submitted</th>
+                  <th className="p-3">Note</th>
                   <th className="p-3">Status</th>
                   <th className="p-3">Grade</th>
                   <th className="p-3">Actions</th>
@@ -247,9 +266,9 @@ export default function Instructor() {
               <tbody>
                 {submissions.map((s) => (
                   <tr key={s.id} className="border-t">
-                    <td className="p-3 font-medium">{s.student}</td>
-                    <td className="p-3">{s.assignment}</td>
-                    <td className="p-3 text-muted-foreground">{s.submittedAt}</td>
+                    <td className="p-3 font-medium truncate">{s.filename}</td>
+                    <td className="p-3 text-muted-foreground">{new Date(s.submittedAt).toLocaleString()}</td>
+                    <td className="p-3 max-w-[280px] truncate" title={s.note}>{s.note || '-'}</td>
                     <td className="p-3">
                       <span className={`rounded-full px-2 py-0.5 text-xs ${
                         s.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -258,39 +277,35 @@ export default function Instructor() {
                       </span>
                     </td>
                     <td className="p-3">
-                      {s.grade ? (
+                      {s.grade != null ? (
                         <span className="font-semibold text-green-600">{s.grade}</span>
                       ) : (
                         <span className="text-muted-foreground">Pending</span>
                       )}
                     </td>
                     <td className="p-3">
-                      {s.status === 'submitted' ? (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => gradeSubmission(s.id, 'A')}
-                            className="rounded bg-green-500 px-2 py-1 text-xs text-white hover:bg-green-600"
-                          >
-                            A
-                          </button>
-                          <button
-                            onClick={() => gradeSubmission(s.id, 'B')}
-                            className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
-                          >
-                            B
-                          </button>
-                          <button
-                            onClick={() => gradeSubmission(s.id, 'C')}
-                            className="rounded bg-orange-500 px-2 py-1 text-xs text-white hover:bg-orange-600"
-                          >
-                            C
-                          </button>
-                        </div>
-                      ) : (
-                        <button className="text-blue-600 hover:underline">
-                          View
+                      <div className="flex items-center gap-2">
+                        {s.path && (
+                          <a className="rounded-md border px-2 py-1 text-xs" href={s.path} target="_blank" rel="noreferrer">View</a>
+                        )}
+                        {s.status !== 'graded' && (
+                          <>
+                            <button onClick={() => gradeSubmission(s.id, 'A')} className="rounded bg-green-500 px-2 py-1 text-xs text-white hover:bg-green-600">A</button>
+                            <button onClick={() => gradeSubmission(s.id, 'B')} className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600">B</button>
+                            <button onClick={() => gradeSubmission(s.id, 'C')} className="rounded bg-orange-500 px-2 py-1 text-xs text-white hover:bg-orange-600">C</button>
+                          </>
+                        )}
+                        <button
+                          className="rounded-md border px-2 py-1 text-xs text-red-600"
+                          onClick={async () => {
+                            if (!confirm('Delete this submission?')) return;
+                            await fetch('/api/assignments', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: s.id }) });
+                            setSubmissions((prev) => prev.filter((x) => x.id !== s.id));
+                          }}
+                        >
+                          Delete
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}
