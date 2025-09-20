@@ -24,10 +24,17 @@ function RoleBadge({ role }: { role: string }) {
         : role === "parent"
           ? "Parent"
           : "Student";
+  const isParent = role === "parent";
   const variant: any =
-    role === "admin" ? "destructive" : role === "student" ? "default" : "secondary";
+    role === "admin" ? "destructive" : role === "student" ? "default" : role === "instructor" ? "secondary" : "default";
   return (
-    <Badge variant={variant} className="rounded-full px-3 py-1 text-xs">
+    <Badge
+      variant={variant}
+      className={
+        "rounded-full px-3 py-1 text-xs" +
+        (isParent ? " border-transparent bg-accent text-accent-foreground hover:bg-accent/80" : "")
+      }
+    >
       {label}
     </Badge>
   );
