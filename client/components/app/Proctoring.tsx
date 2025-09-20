@@ -39,14 +39,20 @@ export function Proctoring() {
   async function start() {
     if (!token) return alert("Please sign in first");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
       const res = await fetch("/api/proctor/start", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({}),
       });
       const data = await res.json();
@@ -68,24 +74,42 @@ export function Proctoring() {
     if (sessionId && token) {
       fetch("/api/proctor/end", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ sessionId }),
       }).catch(() => {});
     }
   }
 
-  async function heartbeat(metrics: { faces: number; facePresent: boolean; multipleFaces: boolean }) {
+  async function heartbeat(metrics: {
+    faces: number;
+    facePresent: boolean;
+    multipleFaces: boolean;
+  }) {
     if (!sessionId || !token) return;
     try {
       await fetch("/api/proctor/heartbeat", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ sessionId, tabHidden: tabHiddenEvents > 0, awaySeconds, ...metrics }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          sessionId,
+          tabHidden: tabHiddenEvents > 0,
+          awaySeconds,
+          ...metrics,
+        }),
       });
     } catch {}
   }
 
-  async function detectFacesFromFrame(): Promise<{ count: number; present: boolean }> {
+  async function detectFacesFromFrame(): Promise<{
+    count: number;
+    present: boolean;
+  }> {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return { count: 0, present: false };
@@ -110,7 +134,9 @@ export function Proctoring() {
     let sum = 0;
     for (let i = 0; i < img.length; i += 4 * 50) {
       // sample every 50px
-      const r = img[i], g = img[i + 1], b = img[i + 2];
+      const r = img[i],
+        g = img[i + 1],
+        b = img[i + 2];
       sum += (r + g + b) / 3;
     }
     const avg = sum / (img.length / (4 * 50));
@@ -125,7 +151,11 @@ export function Proctoring() {
       setFaces(res.count);
       setFacePresent(res.present);
       setMultipleFaces(res.count > 1);
-      heartbeat({ faces: res.count, facePresent: res.present, multipleFaces: res.count > 1 });
+      heartbeat({
+        faces: res.count,
+        facePresent: res.present,
+        multipleFaces: res.count > 1,
+      });
     }, 2000) as any;
   }
 
@@ -138,21 +168,38 @@ export function Proctoring() {
     <div className="space-y-4">
       <div className="rounded-lg border p-4">
         <h2 className="text-lg font-semibold">Webcam Proctoring</h2>
-        <p className="text-sm text-muted-foreground">This feature detects presence, multiple faces, and tab switching.</p>
+        <p className="text-sm text-muted-foreground">
+          This feature detects presence, multiple faces, and tab switching.
+        </p>
         <div className="mt-3 flex items-center gap-2">
           {!running ? (
-            <button onClick={start} className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground">Start</button>
+            <button
+              onClick={start}
+              className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
+            >
+              Start
+            </button>
           ) : (
-            <button onClick={stop} className="rounded-md border px-3 py-1.5">Stop</button>
+            <button onClick={stop} className="rounded-md border px-3 py-1.5">
+              Stop
+            </button>
           )}
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <div>
-            <video ref={videoRef} className="w-full rounded-md bg-black" muted playsInline />
+            <video
+              ref={videoRef}
+              className="w-full rounded-md bg-black"
+              muted
+              playsInline
+            />
           </div>
           <div className="text-sm">
             <div>Session: {sessionId ?? "-"}</div>
-            <div>Face present: {facePresent == null ? "-" : facePresent ? "yes" : "no"}</div>
+            <div>
+              Face present:{" "}
+              {facePresent == null ? "-" : facePresent ? "yes" : "no"}
+            </div>
             <div>Faces detected: {faces}</div>
             <div>Multiple faces: {multipleFaces ? "yes" : "no"}</div>
             <div>Tab hidden events: {tabHiddenEvents}</div>

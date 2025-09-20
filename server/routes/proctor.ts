@@ -29,21 +29,28 @@ export const startProctoring: RequestHandler = async (req, res) => {
 export const heartbeat: RequestHandler = async (req, res) => {
   const decoded = await getDecoded(req);
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
-  const { sessionId, faces = 0, facePresent = false, tabHidden = false, multipleFaces = false, awaySeconds = 0 } =
-    (req.body || {}) as {
-      sessionId: string;
-      faces?: number;
-      facePresent?: boolean;
-      tabHidden?: boolean;
-      multipleFaces?: boolean;
-      awaySeconds?: number;
-    };
+  const {
+    sessionId,
+    faces = 0,
+    facePresent = false,
+    tabHidden = false,
+    multipleFaces = false,
+    awaySeconds = 0,
+  } = (req.body || {}) as {
+    sessionId: string;
+    faces?: number;
+    facePresent?: boolean;
+    tabHidden?: boolean;
+    multipleFaces?: boolean;
+    awaySeconds?: number;
+  };
   if (!sessionId) return res.status(400).json({ error: "sessionId required" });
   const db = getFirestore();
   const ref = db.doc(`proctor_sessions/${sessionId}`);
   const snap = await ref.get();
   if (!snap.exists) return res.status(404).json({ error: "session not found" });
-  if ((snap.data() as any).userId !== decoded.uid) return res.status(403).json({ error: "Forbidden" });
+  if ((snap.data() as any).userId !== decoded.uid)
+    return res.status(403).json({ error: "Forbidden" });
 
   let suspicious = 0;
   if (!facePresent) suspicious += 1;
@@ -87,7 +94,8 @@ export const endProctoring: RequestHandler = async (req, res) => {
   const ref = db.doc(`proctor_sessions/${sessionId}`);
   const snap = await ref.get();
   if (!snap.exists) return res.status(404).json({ error: "session not found" });
-  if ((snap.data() as any).userId !== decoded.uid) return res.status(403).json({ error: "Forbidden" });
+  if ((snap.data() as any).userId !== decoded.uid)
+    return res.status(403).json({ error: "Forbidden" });
   await ref.set(
     {
       status: "ended",

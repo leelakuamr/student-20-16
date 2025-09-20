@@ -4,8 +4,20 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Instructor() {
   const { token } = useAuth();
   const [courses, setCourses] = useState([
-    { id: "c1", title: "Algebra I", students: 28, assignments: 12, description: "Introduction to algebraic concepts" },
-    { id: "c2", title: "Chemistry Basics", students: 24, assignments: 10, description: "Fundamental chemistry principles" },
+    {
+      id: "c1",
+      title: "Algebra I",
+      students: 28,
+      assignments: 12,
+      description: "Introduction to algebraic concepts",
+    },
+    {
+      id: "c2",
+      title: "Chemistry Basics",
+      students: 24,
+      assignments: 10,
+      description: "Fundamental chemistry principles",
+    },
   ]);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [showCreateCourse, setShowCreateCourse] = useState(false);
@@ -28,7 +40,7 @@ export default function Instructor() {
   };
 
   const updateCourse = (id: string, updates: any) => {
-    setCourses(courses.map(c => c.id === id ? { ...c, ...updates } : c));
+    setCourses(courses.map((c) => (c.id === id ? { ...c, ...updates } : c)));
     setEditingCourse(null);
   };
 
@@ -62,7 +74,11 @@ export default function Instructor() {
         body: JSON.stringify({ grade }),
       });
       if (res.ok) {
-        setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, status: "graded", grade } : s)));
+        setSubmissions((prev) =>
+          prev.map((s) =>
+            s.id === id ? { ...s, status: "graded", grade } : s,
+          ),
+        );
       }
     } catch (e) {
       console.error(e);
@@ -95,13 +111,17 @@ export default function Instructor() {
             <div className="space-y-3">
               <input
                 value={newCourse.title}
-                onChange={(e) => setNewCourse({...newCourse, title: e.target.value})}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, title: e.target.value })
+                }
                 placeholder="Course Title"
                 className="w-full rounded-md border px-3 py-2"
               />
               <textarea
                 value={newCourse.description}
-                onChange={(e) => setNewCourse({...newCourse, description: e.target.value})}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, description: e.target.value })
+                }
                 placeholder="Course Description"
                 className="w-full rounded-md border px-3 py-2"
                 rows={3}
@@ -144,7 +164,9 @@ export default function Instructor() {
                   </div>
                 </div>
                 {c.description && (
-                  <div className="mt-1 text-sm text-muted-foreground">{c.description}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {c.description}
+                  </div>
                 )}
                 <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                   <div>
@@ -179,7 +201,9 @@ export default function Instructor() {
                 {courses.map((c) => (
                   <tr key={c.id} className="border-t">
                     <td className="p-3 font-medium">{c.title}</td>
-                    <td className="p-3 text-muted-foreground">{c.description}</td>
+                    <td className="p-3 text-muted-foreground">
+                      {c.description}
+                    </td>
                     <td className="p-3">{c.students}</td>
                     <td className="p-3">{c.assignments}</td>
                     <td className="p-3">
@@ -210,34 +234,42 @@ export default function Instructor() {
           <div className="md:hidden space-y-2">
             {submissions.map((s) => (
               <div key={s.id} className="rounded-lg border p-3">
-                <div className="font-medium">{s.userName || s.student || "Student"}</div>
+                <div className="font-medium">
+                  {s.userName || s.student || "Student"}
+                </div>
                 <div className="mt-1 text-sm">{s.filename || s.assignment}</div>
                 <div className="mt-2 flex items-center justify-between">
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${
-                    s.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      s.status === "graded"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
                     {s.status}
                   </span>
                   {s.grade != null && (
-                    <span className="font-semibold text-green-600">Grade: {s.grade}</span>
+                    <span className="font-semibold text-green-600">
+                      Grade: {s.grade}
+                    </span>
                   )}
                 </div>
-                {s.status === 'submitted' && (
+                {s.status === "submitted" && (
                   <div className="mt-2 flex gap-1">
                     <button
-                      onClick={() => gradeSubmission(s.id, 'A')}
+                      onClick={() => gradeSubmission(s.id, "A")}
                       className="rounded bg-green-500 px-2 py-1 text-xs text-white"
                     >
                       Grade A
                     </button>
                     <button
-                      onClick={() => gradeSubmission(s.id, 'B')}
+                      onClick={() => gradeSubmission(s.id, "B")}
                       className="rounded bg-blue-500 px-2 py-1 text-xs text-white"
                     >
                       Grade B
                     </button>
                     <button
-                      onClick={() => gradeSubmission(s.id, 'C')}
+                      onClick={() => gradeSubmission(s.id, "C")}
                       className="rounded bg-orange-500 px-2 py-1 text-xs text-white"
                     >
                       Grade C
@@ -263,40 +295,54 @@ export default function Instructor() {
               <tbody>
                 {submissions.map((s) => (
                   <tr key={s.id} className="border-t">
-                    <td className="p-3 font-medium">{s.userName || s.student || "Student"}</td>
+                    <td className="p-3 font-medium">
+                      {s.userName || s.student || "Student"}
+                    </td>
                     <td className="p-3">{s.filename || s.assignment}</td>
-                    <td className="p-3 text-muted-foreground">{s.submittedAt?.seconds ? new Date(s.submittedAt.seconds * 1000).toLocaleString() : s.submittedAt}</td>
+                    <td className="p-3 text-muted-foreground">
+                      {s.submittedAt?.seconds
+                        ? new Date(
+                            s.submittedAt.seconds * 1000,
+                          ).toLocaleString()
+                        : s.submittedAt}
+                    </td>
                     <td className="p-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs ${
-                        s.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs ${
+                          s.status === "graded"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
                         {s.status}
                       </span>
                     </td>
                     <td className="p-3">
                       {s.grade != null ? (
-                        <span className="font-semibold text-green-600">{s.grade}</span>
+                        <span className="font-semibold text-green-600">
+                          {s.grade}
+                        </span>
                       ) : (
                         <span className="text-muted-foreground">Pending</span>
                       )}
                     </td>
                     <td className="p-3">
-                      {s.status === 'submitted' ? (
+                      {s.status === "submitted" ? (
                         <div className="flex gap-1">
                           <button
-                            onClick={() => gradeSubmission(s.id, 'A')}
+                            onClick={() => gradeSubmission(s.id, "A")}
                             className="rounded bg-green-500 px-2 py-1 text-xs text-white hover:bg-green-600"
                           >
                             A
                           </button>
                           <button
-                            onClick={() => gradeSubmission(s.id, 'B')}
+                            onClick={() => gradeSubmission(s.id, "B")}
                             className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
                           >
                             B
                           </button>
                           <button
-                            onClick={() => gradeSubmission(s.id, 'C')}
+                            onClick={() => gradeSubmission(s.id, "C")}
                             className="rounded bg-orange-500 px-2 py-1 text-xs text-white hover:bg-orange-600"
                           >
                             C

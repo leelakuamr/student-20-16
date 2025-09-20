@@ -410,7 +410,8 @@ export const handleInstructorSubmissions: RequestHandler = async (req, res) => {
       if (!name && s.userId) {
         try {
           const us = await db.doc(`users/${s.userId}`).get();
-          name = (us.data() as any)?.name || (us.data() as any)?.email || s.userId;
+          name =
+            (us.data() as any)?.name || (us.data() as any)?.email || s.userId;
         } catch {}
       }
       return { id: d.id, ...s, userName: name };
@@ -441,7 +442,9 @@ export const handleGradeSubmission: RequestHandler = async (req, res) => {
     numeric = map[String(grade).trim().toUpperCase()] ?? undefined;
   }
   if (numeric == null)
-    return res.status(400).json({ error: "invalid grade; provide 0-100 or A-F" });
+    return res
+      .status(400)
+      .json({ error: "invalid grade; provide 0-100 or A-F" });
   await ref.set(
     {
       status: "graded",
