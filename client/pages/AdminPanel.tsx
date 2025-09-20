@@ -1,11 +1,11 @@
 import { AdminLayout } from "@/components/app/admin/AdminLayout";
 import { AdminInstructorRequests } from "@/components/app/admin/AdminInstructorRequests";
 import { AdminRoleManager } from "@/components/app/AdminRoleManager";
-import { AdminLayout } from "@/components/app/admin/AdminLayout";
+import { AdminLayout as AdminPanelLayout } from "@/components/app/admin/AdminLayout";
 
 export default function AdminPanel() {
   return (
-    <AdminLayout>
+    <AdminPanelLayout>
       <div className="space-y-6">
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -49,6 +49,6 @@ export default function AdminPanel() {
         <AdminRoleManager />
         <AdminInstructorRequests />
       </div>
-    </AdminLayout>
+    </AdminPanelLayout>
   );
 }
