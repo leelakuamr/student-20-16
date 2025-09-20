@@ -10,6 +10,8 @@ const navItems = [
   { to: "/home", label: "Dashboard" },
   { to: "/instructor", label: "Instructor" },
   { to: "/admin", label: "Admin" },
+  { to: "/admin-panel", label: "Admin Panel" },
+  { to: "/request-instructor", label: "Become Instructor" },
   { to: "/parent", label: "Parent" },
   { to: "/contact-teachers", label: "Contact" },
 ] as const;
@@ -57,12 +59,17 @@ export function Header() {
             .filter((item) => {
               const role = user?.role;
               if (item.to === "/admin") return role === "admin";
+              if (item.to === "/admin-panel")
+                return user?.email === "eedupugantil@gmail.com";
               if (item.to === "/instructor")
                 return role === "instructor" || role === "admin";
               if (item.to === "/parent")
                 return role === "parent" || role === "admin";
               if (item.to === "/home") return !!user; // any authenticated user
-              if (item.to === "/contact-teachers") return user?.role === "student";
+              if (item.to === "/request-instructor")
+                return !!user && role !== "instructor";
+              if (item.to === "/contact-teachers")
+                return user?.role === "student";
               return true; // public
             })
             .map((item) => (
@@ -102,6 +109,8 @@ export function Header() {
                 toast({
                   title: "Coming soon",
                   description: "Collaborative study groups",
+                  variant: "destructive",
+                  duration: 5000,
                 });
               }}
               className={({ isActive }) =>
@@ -123,6 +132,8 @@ export function Header() {
                 toast({
                   title: "Coming soon",
                   description: "Gamification (badges, leaderboards)",
+                  variant: "destructive",
+                  duration: 5000,
                 });
               }}
               className={({ isActive }) =>
@@ -144,6 +155,8 @@ export function Header() {
                 toast({
                   title: "Coming soon",
                   description: "Calendar integration",
+                  variant: "destructive",
+                  duration: 5000,
                 });
               }}
               className={({ isActive }) =>
@@ -185,12 +198,17 @@ export function Header() {
                 .filter((item) => {
                   const role = user?.role;
                   if (item.to === "/admin") return role === "admin";
+                  if (item.to === "/admin-panel")
+                    return user?.email === "eedupugantil@gmail.com";
                   if (item.to === "/instructor")
                     return role === "instructor" || role === "admin";
                   if (item.to === "/parent")
                     return role === "parent" || role === "admin";
                   if (item.to === "/home") return !!user;
-                  if (item.to === "/contact-teachers") return user?.role === "student";
+                  if (item.to === "/request-instructor")
+                    return !!user && role !== "instructor";
+                  if (item.to === "/contact-teachers")
+                    return user?.role === "student";
                   return true;
                 })
                 .map((it) => (
@@ -222,6 +240,8 @@ export function Header() {
                       toast({
                         title: "Coming soon",
                         description: "Collaborative study groups",
+                        variant: "destructive",
+                        duration: 5000,
                       });
                     }}
                     className="block rounded-md px-3 py-2 text-base"
@@ -239,6 +259,8 @@ export function Header() {
                       toast({
                         title: "Coming soon",
                         description: "Gamification (badges, leaderboards)",
+                        variant: "destructive",
+                        duration: 5000,
                       });
                     }}
                     className="block rounded-md px-3 py-2 text-base"
@@ -256,6 +278,8 @@ export function Header() {
                       toast({
                         title: "Coming soon",
                         description: "Calendar integration",
+                        variant: "destructive",
+                        duration: 5000,
                       });
                     }}
                     className="block rounded-md px-3 py-2 text-base"

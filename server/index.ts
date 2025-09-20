@@ -11,6 +11,7 @@ import * as adminRoutes from "./routes/admin";
 import * as contactRoutes from "./routes/contact";
 import * as chatRoutes from "./routes/chat";
 import * as courses from "./routes/courses";
+import * as notifications from "./routes/notifications";
 // Firebase Admin not initialized; client handles auth
 
 export function createServer() {
@@ -72,6 +73,12 @@ export function createServer() {
 
   // Admin
   app.post("/api/admin/role", adminRoutes.setUserRole);
+
+  // Notifications
+  app.post(
+    "/api/notify/instructor-request",
+    notifications.notifyInstructorRequest,
+  );
 
   // Contact teachers
   app.get("/api/teachers", contactRoutes.listTeachers);

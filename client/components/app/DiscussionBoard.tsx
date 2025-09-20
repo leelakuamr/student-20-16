@@ -2,6 +2,21 @@ import { useEffect, useState } from "react";
 
 type Post = { id: string; author: string; content: string; createdAt: string };
 
+function dedupeAndSort(list: Post[]): Post[] {
+  const seen = new Map<string, Post>();
+  for (const p of list) {
+    if (!seen.has(p.id)) seen.set(p.id, p);
+  }
+  return Array.from(seen.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
+function upsert(prev: Post[], added: Post): Post[] {
+  const merged = [added, ...prev];
+  return dedupeAndSort(merged);
+}
+
 export function DiscussionBoard() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [content, setContent] = useState("");
@@ -28,7 +43,7 @@ export function DiscussionBoard() {
         const res = await fetch("/api/discussions");
         if (res.ok) {
           const data = (await res.json()) as { posts: Post[] };
-          setPosts(data.posts);
+          setPosts(dedupeAndSort(data.posts));
         }
       } catch (e) {
         console.error(e);
@@ -42,7 +57,7 @@ export function DiscussionBoard() {
     es.onmessage = (ev) => {
       try {
         const payload = JSON.parse(ev.data) as { post: Post };
-        setPosts((prev) => [payload.post, ...prev]);
+        setPosts((prev) => upsert(prev, payload.post));
       } catch (e) {
         console.error(e);
       }
@@ -70,7 +85,7 @@ export function DiscussionBoard() {
       });
       if (res.ok) {
         const data = (await res.json()) as { post: Post };
-        setPosts((prev) => [data.post, ...prev]);
+        setPosts((prev) => upsert(prev, data.post));
         setContent("");
       }
     } catch (e) {

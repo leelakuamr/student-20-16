@@ -22,6 +22,7 @@ export default function Auth({
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
   // register-only
   const [name, setName] = useState("");
@@ -126,14 +127,35 @@ export default function Auth({
             </div>
             <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
               <span>At least 6 characters.</span>
-              <label className="inline-flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={showPass}
-                  onChange={(e) => setShowPass(e.target.checked)}
-                />
-                Show password
-              </label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const { sendPasswordResetEmail } = await import(
+                        "firebase/auth"
+                      );
+                      await sendPasswordResetEmail(getAuth(), email);
+                      setResetSent(true);
+                      notify("Password reset email sent");
+                    } catch {
+                      notify.error("Could not send reset email");
+                    }
+                  }}
+                  className="hover:underline"
+                  disabled={!emailValid}
+                >
+                  Forgot password?
+                </button>
+                <label className="inline-flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    checked={showPass}
+                    onChange={(e) => setShowPass(e.target.checked)}
+                  />
+                  Show password
+                </label>
+              </div>
             </div>
           </div>
           {mode === "register" && (

@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 
-type User = { id: string; name: string; role?: string } | null;
+type User = { id: string; name: string; email?: string; role?: string } | null;
 
 type AuthContext = {
   user: User;
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const auth = getAuth();
     const db = getFirestore();
     let unsubDoc: (() => void) | null = null;
-    
+
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
         if (unsubDoc) unsubDoc();
@@ -49,10 +49,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         return;
       }
-      
+
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
-      
+
+      // Ensure profile doc exists and auto-promote admin email
+      try {
+        const ref = doc(db, "users", fbUser.uid);
+        const existing = await getDoc(ref);
+        const payload: any = {
+          uid: fbUser.uid,
+          name: fbUser.displayName || fbUser.email || "",
+          email: fbUser.email,
+          updatedAt: serverTimestamp(),
+        };
+        if (fbUser.email === "eedupugantil@gmail.com") payload.role = "admin";
+        await setDoc(
+          ref,
+          { createdAt: serverTimestamp(), ...payload },
+          { merge: true },
+        );
+      } catch (e) {
+        // ignore
+      }
+
       // Live-sync role and profile
       if (unsubDoc) unsubDoc();
       unsubDoc = (await import("firebase/firestore")).onSnapshot(
@@ -62,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser({
             id: fbUser.uid,
             name: fbUser.displayName || fbUser.email || "",
+            email: fbUser.email || undefined,
             role: data.role as string | undefined,
           });
           setLoading(false);
@@ -69,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         () => setLoading(false),
       );
     });
-    
+
     return () => {
       unsub();
       if (unsubDoc) unsubDoc();
