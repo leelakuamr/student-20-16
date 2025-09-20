@@ -75,7 +75,7 @@ const App = () => (
               <Route
                 path="/admin-panel"
                 element={
-                  <ProtectedRoute roles={["admin"]}>
+                  <ProtectedRoute>
                     <AdminEmailGuard allowedEmail="eedupugantil@gmail.com">
                       <AdminPanel />
                     </AdminEmailGuard>
