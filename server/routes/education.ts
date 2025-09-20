@@ -1,27 +1,66 @@
-import { RequestHandler } from "express";
+import type { RequestHandler } from "express";
+import { getFirestore, verifyIdToken, getStorage, admin } from "../firebase";
 
 function genId(prefix = "id") {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  return `${prefix}_${Date.now().toString(36)}_${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
 }
 
-// Persistent JSON storage via utils
-import { readJSON, writeJSON } from "../utils/db";
+async function getAuthedUser(req: any) {
+  const authHeader = (req.headers.authorization || "").replace(
+    "Bearer ",
+    "",
+  );
+  if (!authHeader) return null;
+  try {
+    const decoded = await verifyIdToken(authHeader);
+    return decoded as any;
+  } catch {
+    return null;
+  }
+}
 
 export const handleGetUser: RequestHandler = async (req, res) => {
-  const users = await readJSON("users.json", [{ id: "u1", name: "Student" }]);
-  res.json(users[0]);
+  const decoded = await getAuthedUser(req);
+  const db = getFirestore();
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const ref = db.doc(`users/${decoded.uid}`);
+  const snap = await ref.get();
+  if (!snap.exists) return res.json({ id: decoded.uid, name: decoded.email });
+  const data = snap.data() as any;
+  return res.json({
+    id: decoded.uid,
+    name: data.name || decoded.email || "",
+    email: data.email || decoded.email,
+    role: data.role,
+  });
 };
 
 export const handleGetProgress: RequestHandler = async (req, res) => {
-  const progress = await readJSON("progress.json", [
-    { course: "Algebra I", value: 72 },
-    { course: "Chemistry", value: 64 },
-  ]);
-  res.json({ progress });
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
+  const q = await db
+    .collection("progress")
+    .where("userId", "==", decoded.uid)
+    .get();
+  const progress = q.docs.map((d) => ({
+    course: (d.data() as any).course,
+    value: (d.data() as any).value,
+  }));
+  if (progress.length === 0) {
+    return res.json({
+      progress: [
+        { course: "Algebra I", value: 72 },
+        { course: "Chemistry", value: 64 },
+      ],
+    });
+  }
+  return res.json({ progress });
 };
 
-export const handleGetRecommendations: RequestHandler = async (req, res) => {
-  // Very simple rule-based recommendations for MVP
+export const handleGetRecommendations: RequestHandler = async (_req, res) => {
   const items = [
     {
       id: "r1",
@@ -40,75 +79,55 @@ export const handleGetRecommendations: RequestHandler = async (req, res) => {
 const sseClients: import("http").ServerResponse[] = [];
 const courseSseClients = new Map<string, import("http").ServerResponse[]>();
 
-async function readCourseDiscussionsMap() {
-  const map = (await readJSON(
-    "course-discussions.json",
-    {} as Record<string, any[]>,
-  )) as Record<string, any[]>;
-  return map;
-}
-
-async function writeCourseDiscussionsMap(map: Record<string, any[]>) {
-  await writeJSON("course-discussions.json", map);
-}
-
 export const handleDiscussions: RequestHandler = async (req, res) => {
+  const db = getFirestore();
   if (req.method === "GET") {
-    const discussions = await readJSON("discussions.json", [
-      {
-        id: "d1",
-        author: "Rohan",
-        content: "How do I solve eqn #3?",
-        createdAt: new Date().toISOString(),
-      },
-    ]);
-    return res.json({ posts: discussions });
+    const snap = await db
+      .collection("discussions")
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .get();
+    const posts = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    return res.json({ posts });
   }
   if (req.method === "POST") {
+    const decoded = await getAuthedUser(req);
+    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
     const { content } = req.body as { content: string };
-    const discussions = await readJSON("discussions.json", [] as any[]);
     const post = {
-      id: genId("post"),
-      author: "You",
+      author: decoded.name || decoded.email || "User",
+      authorId: decoded.uid,
       content,
-      createdAt: new Date().toISOString(),
-    };
-    discussions.unshift(post);
-    await writeJSON("discussions.json", discussions);
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    } as any;
+    const ref = await db.collection("discussions").add(post);
+    const saved = { id: ref.id, ...post, createdAt: new Date().toISOString() };
 
-    // broadcast to SSE clients
-    const payload = `data: ${JSON.stringify({ post })}\n\n`;
+    const payload = `data: ${JSON.stringify({ post: saved })}\n\n`;
     for (const client of sseClients.slice()) {
       try {
         client.write(payload);
       } catch (e) {
-        // ignore broken client
         try {
           client.end();
         } catch {}
       }
     }
-
-    return res.status(201).json({ post });
+    return res.status(201).json({ post: saved });
   }
   res.status(405).end();
 };
 
-export const handleDiscussionStream: RequestHandler = async (req, res) => {
-  // SSE endpoint
+export const handleDiscussionStream: RequestHandler = async (_req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no"); // disable proxy buffering if any
-  res.flushHeaders?.();
-
-  // immediately notify client and configure retry
+  res.setHeader("X-Accel-Buffering", "no");
+  (res as any).flushHeaders?.();
   try {
     res.write(`retry: 5000\n`);
     res.write(`: connected\n\n`);
   } catch {}
-
-  // send a ping comment every 30s to keep connection alive
   const ping = setInterval(() => {
     try {
       res.write(`: ping\n\n`);
@@ -116,12 +135,8 @@ export const handleDiscussionStream: RequestHandler = async (req, res) => {
       clearInterval(ping);
     }
   }, 30_000);
-
-  // add to clients
   sseClients.push(res as any);
-
-  // on close, remove
-  req.on("close", () => {
+  (res as any).on("close", () => {
     clearInterval(ping);
     const idx = sseClients.indexOf(res as any);
     if (idx >= 0) sseClients.splice(idx, 1);
@@ -129,45 +144,51 @@ export const handleDiscussionStream: RequestHandler = async (req, res) => {
 };
 
 export const handleDeleteDiscussion: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
   const { id } = req.params as { id?: string };
   if (!id) return res.status(400).json({ error: "id is required" });
-
-  const discussions = await readJSON("discussions.json", [] as any[]);
-  const idx = discussions.findIndex((d: any) => d.id === id);
-  if (idx === -1) return res.status(404).json({ error: "Not found" });
-
-  discussions.splice(idx, 1);
-  await writeJSON("discussions.json", discussions);
-
+  const db = getFirestore();
+  const docRef = db.collection("discussions").doc(id);
+  const snap = await docRef.get();
+  if (!snap.exists) return res.status(404).json({ error: "Not found" });
+  const data = snap.data() as any;
+  const isOwner = data.authorId === decoded.uid;
+  const isAdmin = (await db.doc(`users/${decoded.uid}`).get()).data()?.role === "admin";
+  if (!isOwner && !isAdmin) return res.status(403).json({ error: "Forbidden" });
+  await docRef.delete();
   return res.json({ ok: true });
 };
 
 export const handleCourseDiscussions: RequestHandler = async (req, res) => {
   const { courseId } = req.params as { courseId?: string };
   if (!courseId) return res.status(400).json({ error: "courseId required" });
-
+  const db = getFirestore();
   if (req.method === "GET") {
-    const map = await readCourseDiscussionsMap();
-    const arr = map[courseId] ?? [];
-    return res.json({ posts: arr });
+    const snap = await db
+      .collection(`courses/${courseId}/discussions`)
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .get();
+    const posts = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    return res.json({ posts });
   }
   if (req.method === "POST") {
+    const decoded = await getAuthedUser(req);
+    if (!decoded) return res.status(401).json({ error: "Unauthorized" });
     const { content } = req.body as { content?: string };
     if (!content || !content.trim())
       return res.status(400).json({ error: "content required" });
-    const map = await readCourseDiscussionsMap();
-    const arr = map[courseId] ?? [];
     const post = {
-      id: genId("post"),
-      author: "You",
+      author: decoded.name || decoded.email || "User",
+      authorId: decoded.uid,
       content: content.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    arr.unshift(post);
-    map[courseId] = arr;
-    await writeCourseDiscussionsMap(map);
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    } as any;
+    const ref = await db.collection(`courses/${courseId}/discussions`).add(post);
+    const saved = { id: ref.id, ...post, createdAt: new Date().toISOString() };
 
-    const payload = `data: ${JSON.stringify({ post })}\n\n`;
+    const payload = `data: ${JSON.stringify({ post: saved })}\n\n`;
     const clients = courseSseClients.get(courseId) ?? [];
     for (const client of clients.slice()) {
       try {
@@ -178,8 +199,7 @@ export const handleCourseDiscussions: RequestHandler = async (req, res) => {
         } catch {}
       }
     }
-
-    return res.status(201).json({ post });
+    return res.status(201).json({ post: saved });
   }
   return res.status(405).end();
 };
@@ -194,17 +214,14 @@ export const handleCourseDiscussionStream: RequestHandler = async (
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
-  res.flushHeaders?.();
-
+  (res as any).flushHeaders?.();
   try {
     res.write(`retry: 5000\n`);
     res.write(`: connected\n\n`);
   } catch {}
-
   const arr = courseSseClients.get(courseId) ?? [];
   arr.push(res as any);
   courseSseClients.set(courseId, arr);
-
   const ping = setInterval(() => {
     try {
       res.write(`: ping\n\n`);
@@ -212,7 +229,6 @@ export const handleCourseDiscussionStream: RequestHandler = async (
       clearInterval(ping);
     }
   }, 30_000);
-
   req.on("close", () => {
     clearInterval(ping);
     const list = courseSseClients.get(courseId) ?? [];
@@ -226,22 +242,35 @@ export const handleDeleteCourseDiscussion: RequestHandler = async (
   req,
   res,
 ) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
   const { courseId, id } = req.params as { courseId?: string; id?: string };
   if (!courseId || !id)
     return res.status(400).json({ error: "courseId and id required" });
-  const map = await readCourseDiscussionsMap();
-  const arr = map[courseId] ?? [];
-  const idx = arr.findIndex((d: any) => d.id === id);
-  if (idx === -1) return res.status(404).json({ error: "Not found" });
-  arr.splice(idx, 1);
-  map[courseId] = arr;
-  await writeCourseDiscussionsMap(map);
+  const db = getFirestore();
+  const ref = db.doc(`courses/${courseId}/discussions/${id}`);
+  const snap = await ref.get();
+  if (!snap.exists) return res.status(404).json({ error: "Not found" });
+  const data = snap.data() as any;
+  const isOwner = data.authorId === decoded.uid;
+  const isAdmin = (await db.doc(`users/${decoded.uid}`).get()).data()?.role === "admin";
+  if (!isOwner && !isAdmin) return res.status(403).json({ error: "Forbidden" });
+  await ref.delete();
   return res.json({ ok: true });
 };
 
 export const handleAssignments: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
   if (req.method === "GET") {
-    const submissions = await readJSON("submissions.json", [] as any[]);
+    const snap = await db
+      .collection("submissions")
+      .where("userId", "==", decoded.uid)
+      .orderBy("submittedAt", "desc")
+      .limit(50)
+      .get();
+    const submissions = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
     return res.json({ submissions });
   }
   if (req.method === "POST") {
@@ -250,46 +279,49 @@ export const handleAssignments: RequestHandler = async (req, res) => {
       contentBase64?: string;
       note?: string;
     };
-    const submissions = await readJSON("submissions.json", [] as any[]);
-    const s: any = {
-      id: genId("sub"),
+    const id = genId("sub");
+    let storedPath: string | undefined;
+    let downloadUrl: string | undefined;
+
+    const bucket = getStorage().bucket();
+
+    if (contentBase64) {
+      const buffer = Buffer.from(contentBase64, "base64");
+      const safeName = (filename || `upload-${Date.now()}`).replace(/[^a-zA-Z0-9_.-]/g, "_");
+      const objectPath = `assignments/${decoded.uid}/${id}_${safeName}`;
+      const file = bucket.file(objectPath);
+      await file.save(buffer, {
+        resumable: false,
+        metadata: { contentType: "application/octet-stream" },
+      });
+      storedPath = objectPath;
+      const [url] = await file.getSignedUrl({ action: "read", expires: Date.now() + 7 * 24 * 60 * 60 * 1000 });
+      downloadUrl = url;
+    } else if (note) {
+      const objectPath = `assignments/${decoded.uid}/${id}_note.txt`;
+      const file = bucket.file(objectPath);
+      await file.save(Buffer.from(note, "utf-8"), {
+        resumable: false,
+        metadata: { contentType: "text/plain; charset=utf-8" },
+      });
+      storedPath = objectPath;
+      const [url] = await file.getSignedUrl({ action: "read", expires: Date.now() + 7 * 24 * 60 * 60 * 1000 });
+      downloadUrl = url;
+    }
+
+    const submission = {
+      userId: decoded.uid,
       filename: filename ?? `notes-${Date.now()}.txt`,
-      submittedAt: new Date().toISOString(),
+      submittedAt: admin.firestore.FieldValue.serverTimestamp(),
       status: "submitted",
       note: note ?? undefined,
-    };
-    // save file if provided
-    if (contentBase64) {
-      try {
-        const buffer = Buffer.from(contentBase64, "base64");
-        const fs = await import("fs/promises");
-        const path = await import("path");
-        const uploadsDir = path.resolve(__dirname, "../uploads");
-        await fs.mkdir(uploadsDir, { recursive: true });
-        const filePath = path.join(uploadsDir, `${s.id}_${s.filename}`);
-        await fs.writeFile(filePath, buffer);
-        s.path = `/uploads/${s.id}_${s.filename}`;
-      } catch (e) {
-        console.error("file save error", e);
-      }
-    } else if (note) {
-      // save note as a text file for convenience
-      try {
-        const fs = await import("fs/promises");
-        const path = await import("path");
-        const uploadsDir = path.resolve(__dirname, "../uploads");
-        await fs.mkdir(uploadsDir, { recursive: true });
-        const fileName = `${s.id}_note.txt`;
-        const filePath = path.join(uploadsDir, fileName);
-        await fs.writeFile(filePath, note, "utf-8");
-        s.path = `/uploads/${fileName}`;
-      } catch (e) {
-        console.error("note save error", e);
-      }
-    }
-    submissions.unshift(s);
-    await writeJSON("submissions.json", submissions);
-    return res.status(201).json({ submission: s });
+      path: storedPath,
+      url: downloadUrl,
+    } as any;
+
+    const ref = await db.collection("submissions").add(submission);
+    const saved = { id: ref.id, ...submission, submittedAt: new Date().toISOString() };
+    return res.status(201).json({ submission: saved });
   }
   res.status(405).end();
 };

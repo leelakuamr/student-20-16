@@ -13,15 +13,23 @@ export function initFirebase() {
   else if (base64Env) raw = Buffer.from(base64Env, "base64").toString("utf8");
 
   if (!raw) {
-    console.log("No Firebase service account provided in env; skipping Firebase Admin initialization.");
+    console.log(
+      "No Firebase service account provided in env; skipping Firebase Admin initialization.",
+    );
     return;
   }
 
   try {
     const svc = JSON.parse(raw);
+    const projectId: string | undefined = svc.project_id;
+    const storageBucket: string | undefined = projectId
+      ? `${projectId}.appspot.com`
+      : undefined;
+
     admin.initializeApp({
       credential: admin.credential.cert(svc as any),
-      projectId: svc.project_id,
+      projectId,
+      storageBucket,
     });
     initialized = true;
     console.log("Firebase Admin initialized");
@@ -36,7 +44,9 @@ export function isFirebaseAdminReady() {
 
 function ensureInitialized() {
   if (!initialized) {
-    throw new Error("Firebase Admin not initialized. Call initFirebase() and ensure service account provided.");
+    throw new Error(
+      "Firebase Admin not initialized. Call initFirebase() and ensure service account provided.",
+    );
   }
 }
 
@@ -50,7 +60,13 @@ export async function verifyIdToken(idToken: string) {
   return admin.auth().verifyIdToken(idToken);
 }
 
-export async function createUser(options: { email: string; password?: string; displayName?: string; uid?: string; disabled?: boolean; }) {
+export async function createUser(options: {
+  email: string;
+  password?: string;
+  displayName?: string;
+  uid?: string;
+  disabled?: boolean;
+}) {
   ensureInitialized();
   const userRecord = await admin.auth().createUser(options as any);
   return userRecord;
@@ -72,7 +88,10 @@ export async function setCustomClaims(uid: string, claims: Record<string, any>) 
   await admin.auth().setCustomUserClaims(uid, claims);
 }
 
-export async function createCustomToken(uid: string, claims?: Record<string, any>) {
+export async function createCustomToken(
+  uid: string,
+  claims?: Record<string, any>,
+) {
   ensureInitialized();
   return admin.auth().createCustomToken(uid, claims);
 }
