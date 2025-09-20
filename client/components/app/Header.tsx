@@ -87,7 +87,7 @@ export function Header() {
                 {item.label}
               </NavLink>
             ))}
-          {user?.role === "student" && (
+          {user && (
             <NavLink
               to="/discussions"
               className={({ isActive }) =>
@@ -221,7 +221,7 @@ export function Header() {
                     </NavLink>
                   </li>
                 ))}
-              {user?.role === "student" && (
+              {user && (
                 <li>
                   <NavLink
                     to="/discussions"

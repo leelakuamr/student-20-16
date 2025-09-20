@@ -21,8 +21,17 @@ export function ProtectedRoute({
   children: JSX.Element;
   roles?: string[];
 }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
+
+  // Wait for auth to resolve to avoid redirect loops
+  if (loading) {
+    return (
+      <div className="flex h-48 items-center justify-center">
+        <span className="text-sm text-muted-foreground">Loading…</span>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
