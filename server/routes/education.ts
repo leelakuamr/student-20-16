@@ -38,6 +38,16 @@ export const handleGetRecommendations: RequestHandler = async (req, res) => {
 };
 
 const sseClients: import("http").ServerResponse[] = [];
+const courseSseClients = new Map<string, import("http").ServerResponse[]>();
+
+async function readCourseDiscussionsMap() {
+  const map = (await readJSON("course-discussions.json", {} as Record<string, any[]>)) as Record<string, any[]>;
+  return map;
+}
+
+async function writeCourseDiscussionsMap(map: Record<string, any[]>) {
+  await writeJSON("course-discussions.json", map);
+}
 
 export const handleDiscussions: RequestHandler = async (req, res) => {
   if (req.method === "GET") {
@@ -126,6 +136,95 @@ export const handleDeleteDiscussion: RequestHandler = async (req, res) => {
   discussions.splice(idx, 1);
   await writeJSON("discussions.json", discussions);
 
+  return res.json({ ok: true });
+};
+
+export const handleCourseDiscussions: RequestHandler = async (req, res) => {
+  const { courseId } = req.params as { courseId?: string };
+  if (!courseId) return res.status(400).json({ error: "courseId required" });
+
+  if (req.method === "GET") {
+    const map = await readCourseDiscussionsMap();
+    const arr = map[courseId] ?? [];
+    return res.json({ posts: arr });
+  }
+  if (req.method === "POST") {
+    const { content } = req.body as { content?: string };
+    if (!content || !content.trim()) return res.status(400).json({ error: "content required" });
+    const map = await readCourseDiscussionsMap();
+    const arr = map[courseId] ?? [];
+    const post = {
+      id: genId("post"),
+      author: "You",
+      content: content.trim(),
+      createdAt: new Date().toISOString(),
+    };
+    arr.unshift(post);
+    map[courseId] = arr;
+    await writeCourseDiscussionsMap(map);
+
+    const payload = `data: ${JSON.stringify({ post })}\n\n`;
+    const clients = courseSseClients.get(courseId) ?? [];
+    for (const client of clients.slice()) {
+      try {
+        client.write(payload);
+      } catch {
+        try {
+          client.end();
+        } catch {}
+      }
+    }
+
+    return res.status(201).json({ post });
+  }
+  return res.status(405).end();
+};
+
+export const handleCourseDiscussionStream: RequestHandler = async (req, res) => {
+  const { courseId } = req.params as { courseId?: string };
+  if (!courseId) return res.status(400).end();
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders?.();
+
+  try {
+    res.write(`retry: 5000\n`);
+    res.write(`: connected\n\n`);
+  } catch {}
+
+  const arr = courseSseClients.get(courseId) ?? [];
+  arr.push(res as any);
+  courseSseClients.set(courseId, arr);
+
+  const ping = setInterval(() => {
+    try {
+      res.write(`: ping\n\n`);
+    } catch {
+      clearInterval(ping);
+    }
+  }, 30_000);
+
+  req.on("close", () => {
+    clearInterval(ping);
+    const list = courseSseClients.get(courseId) ?? [];
+    const idx = list.indexOf(res as any);
+    if (idx >= 0) list.splice(idx, 1);
+    courseSseClients.set(courseId, list);
+  });
+};
+
+export const handleDeleteCourseDiscussion: RequestHandler = async (req, res) => {
+  const { courseId, id } = req.params as { courseId?: string; id?: string };
+  if (!courseId || !id) return res.status(400).json({ error: "courseId and id required" });
+  const map = await readCourseDiscussionsMap();
+  const arr = map[courseId] ?? [];
+  const idx = arr.findIndex((d: any) => d.id === id);
+  if (idx === -1) return res.status(404).json({ error: "Not found" });
+  arr.splice(idx, 1);
+  map[courseId] = arr;
+  await writeCourseDiscussionsMap(map);
   return res.json({ ok: true });
 };
 
