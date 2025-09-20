@@ -109,9 +109,9 @@ const sseClients: import("http").ServerResponse[] = [];
 const courseSseClients = new Map<string, import("http").ServerResponse[]>();
 
 export const handleDiscussions: RequestHandler = async (req, res) => {
+  const db = getFirestore();
   if (req.method === "GET") {
     try {
-      const db = getFirestore();
       const snap = await db
         .collection("discussions")
         .orderBy("createdAt", "desc")
