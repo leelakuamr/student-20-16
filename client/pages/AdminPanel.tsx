@@ -1,4 +1,3 @@
-import { AdminSidebar } from "@/components/app/admin/AdminSidebar";
 import { AdminLayout } from "@/components/app/admin/AdminLayout";
 
 export default function AdminPanel() {
