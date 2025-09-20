@@ -22,6 +22,7 @@ export default function Auth({
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
   // register-only
   const [name, setName] = useState("");
