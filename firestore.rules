@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && request.auth.token.role == 'admin'; }
+    function isInstructor() { return isSignedIn() && request.auth.token.role == 'instructor'; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if (
+        isOwner(userId) &&
+        request.resource.data.uid == userId &&
+        !request.resource.data.diff(resource.data).changedKeys().hasAny(['role','email','uid'])
+      ) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /progress/{docId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin() || isInstructor();
+      allow create, update: if isOwner(request.resource.data.userId) || isAdmin() || isInstructor();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    match /discussions/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if (isSignedIn() && request.auth.uid == resource.data.authorId) || isAdmin() || isInstructor();
+    }
+
+    match /courses/{courseId}/discussions/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if (isSignedIn() && request.auth.uid == resource.data.authorId) || isAdmin() || isInstructor();
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin() || isInstructor();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if (isOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId) || isAdmin() || isInstructor();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
