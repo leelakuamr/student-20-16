@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import fs from "fs/promises";
 
 const dataDir = path.resolve(__dirname, "../data");
 
