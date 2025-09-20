@@ -54,7 +54,10 @@ export function getFirestore(): Firestore {
     const app = getFirebaseApp();
     try {
       firestore = initializeFirestore(app, {
-        experimentalAutoDetectLongPolling: true,
+        // In sandboxed iframes or certain proxies, Firestore's streaming fetch can abort.
+        // Force a transport that is more compatible.
+        experimentalForceLongPolling: true,
+        useFetchStreams: false,
       });
     } catch (_e) {
       // Fallback to default if initializeFirestore already called elsewhere
