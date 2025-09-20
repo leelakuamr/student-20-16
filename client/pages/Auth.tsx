@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { getAuth, getFirestore } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { toast as notify } from "sonner";
 
 type Mode = "login" | "register";
 
