@@ -90,6 +90,12 @@ export function createServer() {
   app.get("/api/events", gm.getEvents);
   app.post("/api/events", gm.createEvent);
 
+  // Proctoring
+  const proctor = await import("./routes/proctor");
+  app.post("/api/proctor/start", proctor.startProctoring);
+  app.post("/api/proctor/heartbeat", proctor.heartbeat);
+  app.post("/api/proctor/end", proctor.endProctoring);
+
   // User management
   app.delete("/api/users/me", usersRoutes.deleteMe);
   app.delete("/api/users/:id", usersRoutes.deleteUserById);

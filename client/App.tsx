@@ -25,6 +25,7 @@ import ContactTeachersPage from "./pages/ContactTeachers";
 import AdminTeachersPage from "./pages/AdminTeachers";
 import RequestInstructor from "./pages/RequestInstructor";
 import ProfilePage from "./pages/Profile";
+import ProctorPage from "./pages/Proctor";
 import { Layout } from "./components/app/Layout";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/app/ProtectedRoute";
@@ -119,6 +120,14 @@ const App = () => (
                 element={
                   <ProtectedRoute roles={["student"]}>
                     <CalendarPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/proctor"
+                element={
+                  <ProtectedRoute roles={["student"]}>
+                    <ProctorPage />
                   </ProtectedRoute>
                 }
               />
