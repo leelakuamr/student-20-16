@@ -39,7 +39,11 @@ export function ProtectedRoute({
 
   const effectiveRole = user.role;
   if (roles) {
-    // If role not yet loaded, wait to prevent mis-routing (e.g., parent seen as student)
+    // Allow student routes while role is still loading to avoid spinner lock
+    if (!effectiveRole && roles.includes("student")) {
+      return children;
+    }
+    // Otherwise, if role not yet loaded, wait to prevent mis-routing
     if (!effectiveRole) {
       return (
         <div className="flex h-48 items-center justify-center">
