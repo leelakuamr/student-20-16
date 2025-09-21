@@ -12,7 +12,7 @@ export default function Auth({
 }: {
   initialMode?: Mode;
 }) {
-  const { login, register } = useAuth();
+  const { login, register, logout, user } = useAuth();
   const [mode, setMode] = useState<Mode>(initialMode);
   const nav = useNavigate();
 
