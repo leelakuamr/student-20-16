@@ -64,6 +64,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
 
+      // Provisional user immediately (in case Firestore is slow/unavailable)
+      setUser({
+        id: fbUser.uid,
+        name: fbUser.displayName || fbUser.email || "",
+        email: fbUser.email || undefined,
+        role: undefined,
+      });
+
       // Ensure profile doc exists and auto-promote first user or approved email as admin
       try {
         const ref = doc(db, "users", fbUser.uid);
