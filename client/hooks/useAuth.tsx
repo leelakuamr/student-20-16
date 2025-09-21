@@ -64,6 +64,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const idToken = await fbUser.getIdToken();
       setToken(idToken);
 
+      // Provisional user immediately (in case Firestore is slow/unavailable)
+      setUser({
+        id: fbUser.uid,
+        name: fbUser.displayName || fbUser.email || "",
+        email: fbUser.email || undefined,
+        role: undefined,
+      });
+
       // Ensure profile doc exists and auto-promote first user or approved email as admin
       try {
         const ref = doc(db, "users", fbUser.uid);
@@ -116,7 +124,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           setLoading(false);
         },
-        () => setLoading(false),
+        (err) => {
+          // Ignore AbortError (browser cancels streams during nav/hmr)
+          const msg = String(err?.name || err?.message || err || "");
+          if (!msg.includes("AbortError")) {
+            console.warn("Firestore onSnapshot error:", err);
+          }
+          // Fallback if snapshot fails
+          setUser({
+            id: fbUser.uid,
+            name: fbUser.displayName || fbUser.email || "",
+            email: fbUser.email || undefined,
+            role: undefined,
+          });
+          setLoading(false);
+        },
       );
     });
 

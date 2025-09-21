@@ -13,6 +13,7 @@ import * as chatRoutes from "./routes/chat";
 import * as courses from "./routes/courses";
 import * as notifications from "./routes/notifications";
 import * as adaptive from "./routes/adaptive";
+import * as proctor from "./routes/proctor";
 import { initFirebase } from "./firebase";
 // Firebase Admin initialized at startup if service account provided
 
@@ -56,6 +57,8 @@ export function createServer() {
     edu.handleDeleteCourseDiscussion,
   );
   app.all("/api/assignments", edu.handleAssignments);
+  app.get("/api/instructor/submissions", edu.handleInstructorSubmissions);
+  app.post("/api/submissions/:id/grade", edu.handleGradeSubmission);
 
   // Courses
   app.get("/api/courses", courses.listCourses);
@@ -87,6 +90,11 @@ export function createServer() {
   app.post("/api/badges", gm.awardBadge);
   app.get("/api/events", gm.getEvents);
   app.post("/api/events", gm.createEvent);
+
+  // Proctoring
+  app.post("/api/proctor/start", proctor.startProctoring);
+  app.post("/api/proctor/heartbeat", proctor.heartbeat);
+  app.post("/api/proctor/end", proctor.endProctoring);
 
   // User management
   app.delete("/api/users/me", usersRoutes.deleteMe);

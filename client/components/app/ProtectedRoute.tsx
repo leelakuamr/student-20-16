@@ -37,11 +37,25 @@ export function ProtectedRoute({
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  const effectiveRole = user.role ?? "student";
-  if (roles && effectiveRole !== "admin" && !roles.includes(effectiveRole)) {
-    const dest = homeFor(effectiveRole);
-    if (dest === location.pathname) return <Navigate to="/" replace />;
-    return <Navigate to={dest} replace />;
+  const effectiveRole = user.role;
+  if (roles) {
+    // Allow student routes while role is still loading to avoid spinner lock
+    if (!effectiveRole && roles.includes("student")) {
+      return children;
+    }
+    // Otherwise, if role not yet loaded, wait to prevent mis-routing
+    if (!effectiveRole) {
+      return (
+        <div className="flex h-48 items-center justify-center">
+          <span className="text-sm text-muted-foreground">Loading…</span>
+        </div>
+      );
+    }
+    if (effectiveRole !== "admin" && !roles.includes(effectiveRole)) {
+      const dest = homeFor(effectiveRole);
+      if (dest === location.pathname) return <Navigate to="/" replace />;
+      return <Navigate to={dest} replace />;
+    }
   }
 
   return children;

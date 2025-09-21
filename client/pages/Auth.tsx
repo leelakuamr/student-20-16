@@ -12,7 +12,7 @@ export default function Auth({
 }: {
   initialMode?: Mode;
 }) {
-  const { login, register } = useAuth();
+  const { login, register, logout, user } = useAuth();
   const [mode, setMode] = useState<Mode>(initialMode);
   const nav = useNavigate();
 
@@ -22,6 +22,7 @@ export default function Auth({
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState("");
+  const [emailExists, setEmailExists] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
   // register-only
@@ -39,22 +40,47 @@ export default function Auth({
     if (!adminAllowed && role === "admin") setRole("student");
   }, [adminAllowed]);
 
+  function friendly(err: any): string {
+    const code = String(err?.code || err?.message || err || "");
+    if (code.includes("email-already-in-use") || code.includes("EMAIL_EXISTS"))
+      return "Email already in use. Try signing in.";
+    if (code.includes("network-request-failed"))
+      return "Network issue. Check connection and try again.";
+    if (
+      code.includes("invalid-credential") ||
+      code.includes("INVALID_LOGIN_CREDENTIALS")
+    )
+      return "Invalid email or password.";
+    return code;
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr("");
+    setEmailExists(false);
     try {
       if (mode === "login") {
         await login(email, password, remember);
         notify("Signed in successfully");
       } else {
+        if (user) {
+          // Ensure clean state before creating a new account
+          await logout();
+        }
         await register(name, email, password, role, remember);
         notify("Account created");
       }
       // Redirect to role-based home page
       nav("/home");
-    } catch (e) {
-      setErr(mode === "login" ? "Login failed" : "Registration failed");
-      notify.error(mode === "login" ? "Login failed" : "Registration failed");
+    } catch (e: any) {
+      const msgBase = friendly(e);
+      if (msgBase.includes("Email already in use")) setEmailExists(true);
+      const msg =
+        mode === "login"
+          ? `Login failed: ${msgBase}`
+          : `Registration failed: ${msgBase}`;
+      setErr(msg);
+      notify.error(msg);
     }
   }
 
@@ -92,6 +118,20 @@ export default function Auth({
             aria-live="polite"
           >
             {err}
+            {emailExists && mode === "register" && (
+              <div className="mt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("login");
+                    setErr("");
+                  }}
+                  className="underline"
+                >
+                  Use this email to sign in
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -203,7 +243,10 @@ export default function Auth({
           <div className="flex items-center justify-end">
             <button
               type="button"
-              onClick={() => setMode(mode === "login" ? "register" : "login")}
+              onClick={() => {
+                setErr("");
+                setMode(mode === "login" ? "register" : "login");
+              }}
               className="text-sm text-muted-foreground hover:underline"
             >
               {mode === "login"

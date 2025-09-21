@@ -20,8 +20,8 @@ async function getAuthedUser(req: any) {
 
 export const handleGetUser: RequestHandler = async (req, res) => {
   const decoded = await getAuthedUser(req);
-  const db = getFirestore();
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
   const ref = db.doc(`users/${decoded.uid}`);
   const snap = await ref.get();
   if (!snap.exists) return res.json({ id: decoded.uid, name: decoded.email });
@@ -111,13 +111,24 @@ const courseSseClients = new Map<string, import("http").ServerResponse[]>();
 export const handleDiscussions: RequestHandler = async (req, res) => {
   const db = getFirestore();
   if (req.method === "GET") {
-    const snap = await db
-      .collection("discussions")
-      .orderBy("createdAt", "desc")
-      .limit(50)
-      .get();
-    const posts = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-    return res.json({ posts });
+    try {
+      const snap = await db
+        .collection("discussions")
+        .orderBy("createdAt", "desc")
+        .limit(50)
+        .get();
+      const posts = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+      return res.json({ posts });
+    } catch {
+      try {
+        const { readJSON } = await import("../utils/db");
+        const data = await readJSON<any>("discussions.json", []);
+        const posts = Array.isArray(data) ? data : data.posts || [];
+        return res.json({ posts });
+      } catch {
+        return res.json({ posts: [] });
+      }
+    }
   }
   if (req.method === "POST") {
     const decoded = await getAuthedUser(req);
@@ -297,16 +308,23 @@ export const handleAssignments: RequestHandler = async (req, res) => {
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
   const db = getFirestore();
   if (req.method === "GET") {
+    // Avoid composite index requirement (where + orderBy) by sorting in memory
     const snap = await db
       .collection("submissions")
       .where("userId", "==", decoded.uid)
-      .orderBy("submittedAt", "desc")
       .limit(50)
       .get();
-    const submissions = snap.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() as any),
-    }));
+    const submissions = snap.docs
+      .map((d) => ({ id: d.id, ...(d.data() as any) }))
+      .sort((a, b) => {
+        const ta = (
+          a.submittedAt?.toDate?.() ?? new Date(a.submittedAt || 0)
+        ).getTime();
+        const tb = (
+          b.submittedAt?.toDate?.() ?? new Date(b.submittedAt || 0)
+        ).getTime();
+        return tb - ta;
+      });
     return res.json({ submissions });
   }
   if (req.method === "POST") {
@@ -354,8 +372,12 @@ export const handleAssignments: RequestHandler = async (req, res) => {
       downloadUrl = url;
     }
 
+    const userSnap = await db.doc(`users/${decoded.uid}`).get();
+    const userName = (userSnap.data() as any)?.name || decoded.email || "";
+
     const submission = {
       userId: decoded.uid,
+      userName,
       filename: filename ?? `notes-${Date.now()}.txt`,
       submittedAt: admin.firestore.FieldValue.serverTimestamp(),
       status: "submitted",
@@ -373,4 +395,71 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     return res.status(201).json({ submission: saved });
   }
   res.status(405).end();
+};
+
+export const handleInstructorSubmissions: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
+  const me = await db.doc(`users/${decoded.uid}`).get();
+  const role = (me.data() as any)?.role;
+  if (role !== "instructor" && role !== "admin")
+    return res.status(403).json({ error: "Forbidden" });
+  const snap = await db
+    .collection("submissions")
+    .orderBy("submittedAt", "desc")
+    .limit(50)
+    .get();
+  const submissions = await Promise.all(
+    snap.docs.map(async (d) => {
+      const s = d.data() as any;
+      let name = s.userName as string | undefined;
+      if (!name && s.userId) {
+        try {
+          const us = await db.doc(`users/${s.userId}`).get();
+          name =
+            (us.data() as any)?.name || (us.data() as any)?.email || s.userId;
+        } catch {}
+      }
+      return { id: d.id, ...s, userName: name };
+    }),
+  );
+  return res.json({ submissions });
+};
+
+export const handleGradeSubmission: RequestHandler = async (req, res) => {
+  const decoded = await getAuthedUser(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+  const db = getFirestore();
+  const me = await db.doc(`users/${decoded.uid}`).get();
+  const role = (me.data() as any)?.role;
+  if (role !== "instructor" && role !== "admin")
+    return res.status(403).json({ error: "Forbidden" });
+  const { id } = req.params as { id?: string };
+  if (!id) return res.status(400).json({ error: "id required" });
+  const { grade } = req.body as { grade: number | string };
+  if (grade == null) return res.status(400).json({ error: "grade required" });
+  const ref = db.doc(`submissions/${id}`);
+  const snap = await ref.get();
+  if (!snap.exists) return res.status(404).json({ error: "Not found" });
+  let numeric: number | undefined;
+  if (typeof grade === "number") numeric = Math.max(0, Math.min(100, grade));
+  else {
+    const map: Record<string, number> = { A: 95, B: 85, C: 75, D: 65, F: 50 };
+    numeric = map[String(grade).trim().toUpperCase()] ?? undefined;
+  }
+  if (numeric == null)
+    return res
+      .status(400)
+      .json({ error: "invalid grade; provide 0-100 or A-F" });
+  await ref.set(
+    {
+      status: "graded",
+      grade: numeric,
+      gradedAt: admin.firestore.FieldValue.serverTimestamp(),
+      graderId: decoded.uid,
+    },
+    { merge: true },
+  );
+  return res.json({ ok: true, id, grade: numeric });
 };

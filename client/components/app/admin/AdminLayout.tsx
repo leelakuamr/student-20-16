@@ -1,5 +1,4 @@
 import { PropsWithChildren } from "react";
-import { PropsWithChildren } from "react";
 import { AdminSidebar } from "./AdminSidebar";
 
 export function AdminLayout({ children }: PropsWithChildren) {
