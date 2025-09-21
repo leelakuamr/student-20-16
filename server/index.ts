@@ -13,6 +13,7 @@ import * as chatRoutes from "./routes/chat";
 import * as courses from "./routes/courses";
 import * as notifications from "./routes/notifications";
 import * as adaptive from "./routes/adaptive";
+import * as proctor from "./routes/proctor";
 import { initFirebase } from "./firebase";
 // Firebase Admin initialized at startup if service account provided
 
