@@ -308,16 +308,19 @@ export const handleAssignments: RequestHandler = async (req, res) => {
   if (!decoded) return res.status(401).json({ error: "Unauthorized" });
   const db = getFirestore();
   if (req.method === "GET") {
+    // Avoid composite index requirement (where + orderBy) by sorting in memory
     const snap = await db
       .collection("submissions")
       .where("userId", "==", decoded.uid)
-      .orderBy("submittedAt", "desc")
       .limit(50)
       .get();
-    const submissions = snap.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() as any),
-    }));
+    const submissions = snap.docs
+      .map((d) => ({ id: d.id, ...(d.data() as any) }))
+      .sort((a, b) => {
+        const ta = (a.submittedAt?.toDate?.() ?? new Date(a.submittedAt || 0)).getTime();
+        const tb = (b.submittedAt?.toDate?.() ?? new Date(b.submittedAt || 0)).getTime();
+        return tb - ta;
+      });
     return res.json({ submissions });
   }
   if (req.method === "POST") {
