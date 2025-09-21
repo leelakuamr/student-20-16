@@ -91,7 +91,6 @@ export function createServer() {
   app.post("/api/events", gm.createEvent);
 
   // Proctoring
-  const proctor = await import("./routes/proctor");
   app.post("/api/proctor/start", proctor.startProctoring);
   app.post("/api/proctor/heartbeat", proctor.heartbeat);
   app.post("/api/proctor/end", proctor.endProctoring);
