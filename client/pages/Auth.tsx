@@ -47,14 +47,20 @@ export default function Auth({
         await login(email, password, remember);
         notify("Signed in successfully");
       } else {
+        if (user) {
+          // Ensure clean state before creating a new account
+          await logout();
+        }
         await register(name, email, password, role, remember);
         notify("Account created");
       }
       // Redirect to role-based home page
       nav("/home");
-    } catch (e) {
-      setErr(mode === "login" ? "Login failed" : "Registration failed");
-      notify.error(mode === "login" ? "Login failed" : "Registration failed");
+    } catch (e: any) {
+      const code = e?.code || e?.message || String(e);
+      const msg = mode === "login" ? `Login failed: ${code}` : `Registration failed: ${code}`;
+      setErr(msg);
+      notify.error(msg);
     }
   }
 
@@ -203,7 +209,10 @@ export default function Auth({
           <div className="flex items-center justify-end">
             <button
               type="button"
-              onClick={() => setMode(mode === "login" ? "register" : "login")}
+              onClick={() => {
+                setErr("");
+                setMode(mode === "login" ? "register" : "login");
+              }}
               className="text-sm text-muted-foreground hover:underline"
             >
               {mode === "login"
