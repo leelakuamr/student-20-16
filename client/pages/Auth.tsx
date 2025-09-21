@@ -42,9 +42,15 @@ export default function Auth({
 
   function friendly(err: any): string {
     const code = String(err?.code || err?.message || err || "");
-    if (code.includes("email-already-in-use") || code.includes("EMAIL_EXISTS")) return "Email already in use. Try signing in.";
-    if (code.includes("network-request-failed")) return "Network issue. Check connection and try again.";
-    if (code.includes("invalid-credential") || code.includes("INVALID_LOGIN_CREDENTIALS")) return "Invalid email or password.";
+    if (code.includes("email-already-in-use") || code.includes("EMAIL_EXISTS"))
+      return "Email already in use. Try signing in.";
+    if (code.includes("network-request-failed"))
+      return "Network issue. Check connection and try again.";
+    if (
+      code.includes("invalid-credential") ||
+      code.includes("INVALID_LOGIN_CREDENTIALS")
+    )
+      return "Invalid email or password.";
     return code;
   }
 
@@ -69,7 +75,10 @@ export default function Auth({
     } catch (e: any) {
       const msgBase = friendly(e);
       if (msgBase.includes("Email already in use")) setEmailExists(true);
-      const msg = mode === "login" ? `Login failed: ${msgBase}` : `Registration failed: ${msgBase}`;
+      const msg =
+        mode === "login"
+          ? `Login failed: ${msgBase}`
+          : `Registration failed: ${msgBase}`;
       setErr(msg);
       notify.error(msg);
     }

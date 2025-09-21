@@ -317,8 +317,12 @@ export const handleAssignments: RequestHandler = async (req, res) => {
     const submissions = snap.docs
       .map((d) => ({ id: d.id, ...(d.data() as any) }))
       .sort((a, b) => {
-        const ta = (a.submittedAt?.toDate?.() ?? new Date(a.submittedAt || 0)).getTime();
-        const tb = (b.submittedAt?.toDate?.() ?? new Date(b.submittedAt || 0)).getTime();
+        const ta = (
+          a.submittedAt?.toDate?.() ?? new Date(a.submittedAt || 0)
+        ).getTime();
+        const tb = (
+          b.submittedAt?.toDate?.() ?? new Date(b.submittedAt || 0)
+        ).getTime();
         return tb - ta;
       });
     return res.json({ submissions });
