@@ -124,7 +124,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           setLoading(false);
         },
-        () => {
+        (err) => {
+          // Ignore AbortError (browser cancels streams during nav/hmr)
+          const msg = String(err?.name || err?.message || err || "");
+          if (!msg.includes("AbortError")) {
+            console.warn("Firestore onSnapshot error:", err);
+          }
           // Fallback if snapshot fails
           setUser({
             id: fbUser.uid,
