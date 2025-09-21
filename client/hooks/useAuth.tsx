@@ -124,7 +124,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           setLoading(false);
         },
-        () => setLoading(false),
+        () => {
+          // Fallback if snapshot fails
+          setUser({
+            id: fbUser.uid,
+            name: fbUser.displayName || fbUser.email || "",
+            email: fbUser.email || undefined,
+            role: undefined,
+          });
+          setLoading(false);
+        },
       );
     });
 
